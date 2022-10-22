@@ -46,7 +46,7 @@ const isAdmin = t.middleware(({ ctx, next }) => {
   if (
     !ctx.session ||
     !ctx.session.user ||
-    !(ctx.session.user.email === env.ADMIN_EMAIL)
+    ctx.session.user.email !== env.ADMIN_EMAIL
   ) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }

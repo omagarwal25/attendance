@@ -11,23 +11,26 @@ export default async function userHandler(
   if (method !== "POST") return res.status(405).end();
   // auth the raspberry pi
 
-  // get the auth token from the request using baerer token
+  // get the auth token from the request using bearer token
   const token = req.headers.authorization?.split(" ")[1];
 
-  if (token !== env.PI_BAERER_TOKEN) return res.status(401).end();
+  if (token !== env.PI_BEARER_TOKEN) return res.status(401).end();
 
   // Get data from your database
   if (!req.body.rfid) return res.status(400).json({ error: "No RFID" });
   const rfid: string = req.body.rfid as string;
 
   // find the user with the rfid
-  const user = await prisma.user.findFirst({
+  const tag = await prisma.tag.findUnique({
     where: {
-      tags: {
-        has: rfid,
-      },
+      uuid: rfid,
+    },
+    include: {
+      user: true,
     },
   });
+
+  const user = tag?.user;
 
   if (!user) return res.status(404).json({ error: "User not found" });
 
