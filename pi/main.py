@@ -1,7 +1,12 @@
+import os
 import time
 
 import MFRC522
+import requests
 import RPi.GPIO as GPIO
+
+API_URL = os.environ.get('API_URL')
+API_TOKEN = os.environ.get('API_TOKEN')
 
 # Create an object of the class MFRC522
 MIFAREReader = MFRC522.MFRC522()
@@ -25,7 +30,22 @@ try:
       # Print UID
       print(f"UID: {str(uid[0])},{str(uid[1])},{str(uid[2])},{str(uid[3])}")
 
-      time.sleep(2)
+      # Send off a signal to the server
+      # RestAPI to env API_URL/pi/tap POST using requests
+      # Body: { uid: [uid[0], uid[1], uid[2], uid[3]] }
+      # Auth: Bearer token from env
+      
+      res = requests.post(f"{API_URL}/pi/tap", json={ "rfid": f"{uid[0]}{uid[1]}{uid[2]}{uid[3]}"}, headers={ "Authorization": f"Bearer {API_TOKEN}"})
+
+      if res.status_code != 200:
+        # color the LEDs 
+        print(f"Error: {res.status_code}")
+      else:
+        is_tap_in: bool = res.json().get('start')
+        # whatever LEDs or displays we want to use
+
+      time.sleep(1)
+      # Reset LEDs
 
 except KeyboardInterrupt:
   GPIO.cleanup()
