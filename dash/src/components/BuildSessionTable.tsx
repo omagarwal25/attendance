@@ -58,7 +58,7 @@ const BuildSessionTableRow: FC<{ session: Row; isAdmin: boolean }> = ({
           </Link>
         </td>
       )}
-      <td>{new Date(session.startAt).toLocaleTimeString()}</td>
+      <td>{new Date(session.startAt).toLocaleDateString()}</td>
       {!editMode ? (
         <>
           <td>
