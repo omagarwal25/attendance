@@ -38,15 +38,16 @@ try:
       # hash + salt the uid
       uid_str = f"{uid[0]}{uid[1]}{uid[2]}{uid[3]}"
       
-      # res = requests.post(f"{API_URL}/rest/tap", json={ "rfid": uid_str}, headers={ "Authorization": f"Bearer {API_TOKEN}"})
+      res = requests.post(f"{API_URL}/rest/tap", json={ "rfid": uid_str}, headers={ "Authorization": f"Bearer {API_TOKEN}"})
 
 
-      # if res.status_code != 200:
-      #   # color the LEDs 
-      #   print(f"Error: {res.status_code}")
-      # else:
-      #   is_tap_in: bool = res.json().get('start')
-      #   # whatever LEDs or displays we want to use
+      if res.status_code != 200:
+        # color the LEDs 
+        print(f"Error: {res.status_code}")
+      else:
+        is_tap_in: bool = res.json().get('start')
+        print(is_tap_in)
+        # whatever LEDs or displays we want to use
 
       time.sleep(1)
       # Reset LEDs
