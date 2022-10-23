@@ -9,6 +9,8 @@ export default function UserPage() {
   const { userId } = router.query;
   const { data, status } = useSession();
 
+  // TODO flash something to indicate the status of the user's RFIDs
+
   const buildSessions = trpc.buildSession.byUser.useQuery(userId as string);
   const leaderboard = trpc.leaderboard.byUser.useQuery(userId as string);
 

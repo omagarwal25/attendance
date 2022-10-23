@@ -31,7 +31,7 @@ export const Nav = () => {
           </>
         ) : (
           <button
-            className="justify-end bg-blue-500 p-2"
+            className="justify-end rounded bg-blue-500 p-2"
             onClick={() => signIn()}
           >
             Sign In

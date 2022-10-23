@@ -1,7 +1,6 @@
 import { BuildSession } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { env } from "~env/server.mjs";
 import { adminProcedure, protectedProcedure, router } from "../trpc";
 
 const calculateHoursFromListOfSessions = (sessions: BuildSession[]) => {
@@ -41,10 +40,7 @@ export const leaderboardRouter = router({
   }),
 
   byUser: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    if (
-      !(ctx.session.user.id === input) &&
-      !(ctx.session.user.email === env.ADMIN_EMAIL)
-    )
+    if (!(ctx.session.user.id === input) && !ctx.session.user.isAdmin)
       throw new TRPCError({ code: "UNAUTHORIZED" });
 
     const user = await ctx.prisma.user.findUnique({

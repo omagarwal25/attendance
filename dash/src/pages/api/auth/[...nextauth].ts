@@ -10,10 +10,10 @@ export const authOptions: NextAuthOptions = {
   // Include user.id on session
   callbacks: {
     session({ session, user }) {
-    
       if (session.user) {
         session.user.id = user.id;
         session.user.email = user.email ?? "";
+        session.user.isAdmin = user.email === env.ADMIN_EMAIL;
       }
       return session;
     },

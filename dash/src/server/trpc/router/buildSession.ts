@@ -11,7 +11,7 @@ export const buildSessionRouter = router({
 
   byUser: protectedProcedure.input(z.string()).query(({ ctx, input }) => {
     if (
-      ctx.session.user.email === env.ADMIN_EMAIL ||
+      ctx.session.user.isAdmin ||
       ctx.session.user.id === input
     ) {
       return ctx.prisma.buildSession.findMany({

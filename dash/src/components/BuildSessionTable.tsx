@@ -1,5 +1,6 @@
 import { Icon } from "@iconify-icon/react";
 import { BuildSession, User } from "@prisma/client";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FC, useState } from "react";
@@ -9,13 +10,16 @@ type Row = BuildSession & { user: User };
 
 export const BuildSessionTable: FC<{
   sessions: (BuildSession & { user: User })[];
-  showUser?: boolean;
-}> = ({ sessions, showUser }) => {
+}> = ({ sessions }) => {
+  const { data } = useSession();
+
+  const isAdmin = data?.user?.isAdmin ?? false;
+
   return (
     <table className="table-auto">
       <thead>
         <tr>
-          {showUser && <th>User</th>}
+          {isAdmin && <th>User</th>}
           <th>Date</th>
           <th>Start At</th>
           <th>Start End</th>
@@ -26,7 +30,7 @@ export const BuildSessionTable: FC<{
           <BuildSessionTableRow
             key={session.id}
             session={session}
-            showUser={showUser}
+            isAdmin={isAdmin}
           />
         ))}
       </tbody>
@@ -34,17 +38,20 @@ export const BuildSessionTable: FC<{
   );
 };
 
-const BuildSessionTableRow: FC<{ session: Row; showUser?: boolean }> = ({
+const BuildSessionTableRow: FC<{ session: Row; isAdmin: boolean }> = ({
   session,
-  showUser,
+  isAdmin,
 }) => {
   const [editMode, setEditMode] = useState(false);
+
+  const deleteSession = trpc.buildSession.delete.useMutation();
+  const router = useRouter();
 
   // if the edit mode is true we must have the start and end times be editable.
 
   return (
     <tr>
-      {showUser && (
+      {isAdmin && (
         <td>
           <Link href={`/user/${session.user.id}`}>
             <a className="underline">{session.user.email}</a>
@@ -70,15 +77,34 @@ const BuildSessionTableRow: FC<{ session: Row; showUser?: boolean }> = ({
               <>
                 <span className="flex items-center gap-1 text-red-500">
                   None
-                  <Icon
-                    icon="heroicons:pencil-square-20-solid"
-                    onClick={() => setEditMode(true)}
-                  />
+                  {!isAdmin && (
+                    <Icon
+                      icon="heroicons:pencil-square-20-solid"
+                      onClick={() => setEditMode(true)}
+                    />
+                  )}
                 </span>
                 {/** Make this ediable eventually */}
               </>
             )}
           </td>
+          {isAdmin && (
+            <Icon
+              icon="heroicons:pencil-square-solid"
+              className="cursor-pointer text-2xl"
+              onClick={() => setEditMode(true)}
+            />
+          )}
+          {isAdmin && (
+            <Icon
+              icon="heroicons:trash-solid"
+              className="cursor-pointer text-2xl"
+              onClick={async () => {
+                await deleteSession.mutate(session.id);
+                router.reload();
+              }}
+            />
+          )}
         </>
       ) : (
         <EditableStartAndEnd
@@ -100,7 +126,11 @@ const EditableStartAndEnd: FC<{ session: Row; onCloseEdit: () => void }> = ({
     hours: session.startAt.getHours(),
     minutes: session.startAt.getMinutes(),
   });
-  const [endAt, setEndAt] = useState({ hours: 0, minutes: 0 });
+  const [endAt, setEndAt] = useState(
+    session.endAt
+      ? { hours: session.endAt.getHours(), minutes: session.endAt.getMinutes() }
+      : { hours: 0, minutes: 0 }
+  );
   const router = useRouter();
 
   const mutate = trpc.buildSession.edit.useMutation();
@@ -200,7 +230,7 @@ const EditableStartAndEnd: FC<{ session: Row; onCloseEdit: () => void }> = ({
       </td>
       <Icon
         icon="heroicons:check-circle-solid"
-        className="cursor-pointer text-3xl text-green-800"
+        className="cursor-pointer text-2xl text-green-800"
         onClick={onSubmit}
       />
     </>

@@ -1,6 +1,5 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { env } from "~env/server.mjs";
 import type { Context } from "./context";
 
 const t = initTRPC.context<Context>().create({
@@ -43,11 +42,7 @@ export const protectedProcedure = t.procedure.use(isAuthed);
  * users are admins
  */
 const isAdmin = t.middleware(({ ctx, next }) => {
-  if (
-    !ctx.session ||
-    !ctx.session.user ||
-    ctx.session.user.email !== env.ADMIN_EMAIL
-  ) {
+  if (!ctx.session || !ctx.session.user || !ctx.session.user.isAdmin) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({

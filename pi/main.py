@@ -4,6 +4,9 @@ import time
 import MFRC522
 import requests
 import RPi.GPIO as GPIO
+from dotenv import load_dotenv
+
+load_dotenv()
 
 API_URL = os.environ.get('API_URL')
 API_TOKEN = os.environ.get('API_TOKEN')
