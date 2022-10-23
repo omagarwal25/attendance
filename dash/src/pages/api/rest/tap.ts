@@ -1,6 +1,7 @@
+import argon2 from "argon2";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { env } from "../../../env/server.mjs";
-import { prisma } from "../../../server/db/client";
+import { env } from "~env/server.mjs";
+import { prisma } from "~server/db/client";
 
 export default async function userHandler(
   req: NextApiRequest,
@@ -21,14 +22,23 @@ export default async function userHandler(
   const rfid: string = req.body.rfid as string;
 
   // find the user with the rfid
-  const tag = await prisma.tag.findUnique({
-    where: {
-      uuid: rfid,
-    },
+  // const tag = await prisma.tag.findUnique({
+  //   where: {
+  //     uuid: hashed,
+  //   },
+  //   include: {
+  //     user: true,
+  //   },
+  // });
+
+  // because we are using argon2, we need to use it to compare the rfid
+  const tags = await prisma.tag.findMany({
     include: {
       user: true,
     },
   });
+
+  const tag = tags.find((tag) => argon2.verify(tag.uuid, rfid));
 
   const user = tag?.user;
 

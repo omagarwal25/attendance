@@ -1,7 +1,7 @@
 import { BuildSession } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { env } from "../../../env/server.mjs";
+import { env } from "~env/server.mjs";
 import { adminProcedure, protectedProcedure, router } from "../trpc";
 
 const calculateHoursFromListOfSessions = (sessions: BuildSession[]) => {

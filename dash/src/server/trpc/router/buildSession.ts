@@ -1,12 +1,12 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { env } from "../../../env/server.mjs";
-import { buildSessionSchema } from "../../../models/buildSession";
+import { env } from "~env/server.mjs";
+import { buildSessionSchema } from "~models/buildSession";
 import { adminProcedure, protectedProcedure, router } from "../trpc";
 
 export const buildSessionRouter = router({
   all: adminProcedure.query(({ ctx }) => {
-    return ctx.prisma.session.findMany({ include: { user: true } });
+    return ctx.prisma.buildSession.findMany({ include: { user: true } });
   }),
 
   byUser: protectedProcedure.input(z.string()).query(({ ctx, input }) => {
@@ -14,7 +14,7 @@ export const buildSessionRouter = router({
       ctx.session.user.email === env.ADMIN_EMAIL ||
       ctx.session.user.id === input
     ) {
-      return ctx.prisma.session.findMany({
+      return ctx.prisma.buildSession.findMany({
         where: { userId: input },
         include: { user: true },
       });
@@ -23,22 +23,39 @@ export const buildSessionRouter = router({
     }
   }),
 
-  edit: adminProcedure
+  edit: protectedProcedure
     .input(
-      z
-        .object({ id: z.string(), data: buildSessionSchema.omit({ id: true }) })
-        .partial()
+      z.object({
+        id: z.string(),
+        data: buildSessionSchema.omit({ id: true, manual: true }).partial(),
+      })
     )
-    .query(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       const { id, data } = input;
-      const session = await ctx.prisma.buildSession.update({
+
+      // grab the session
+      const session = await ctx.prisma.buildSession.findUnique({
         where: { id },
-        data: { ...data },
+        include: { user: true },
       });
-      return session;
+
+      if (!session) throw new TRPCError({ code: "NOT_FOUND" });
+
+      if (
+        ctx.session.user.email !== env.ADMIN_EMAIL &&
+        ctx.session.user.id !== session.userId
+      )
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+
+      const updatedSession = await ctx.prisma.buildSession.update({
+        where: { id },
+        data: { ...data, manual: true },
+      });
+
+      return updatedSession;
     }),
 
-  delete: adminProcedure.input(z.string()).query(async ({ ctx, input }) => {
+  delete: adminProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
     const session = await ctx.prisma.buildSession.delete({
       where: { id: input },
     });
@@ -46,12 +63,13 @@ export const buildSessionRouter = router({
   }),
 
   create: adminProcedure
-    .input(buildSessionSchema.omit({ id: true }))
-    .query(async ({ ctx, input }) => {
+    .input(buildSessionSchema.omit({ id: true, manual: true }))
+    .mutation(async ({ ctx, input }) => {
       const { userId, ...data } = input;
       const session = await ctx.prisma.buildSession.create({
         data: {
           ...data,
+          manual: true,
           user: {
             connect: { id: userId },
           },

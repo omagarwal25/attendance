@@ -34,8 +34,12 @@ try:
       # RestAPI to env API_URL/pi/tap POST using requests
       # Body: { uid: [uid[0], uid[1], uid[2], uid[3]] }
       # Auth: Bearer token from env
+
+      # hash + salt the uid
+      uid_str = f"{uid[0]}{uid[1]}{uid[2]}{uid[3]}"
       
-      res = requests.post(f"{API_URL}/pi/tap", json={ "rfid": f"{uid[0]}{uid[1]}{uid[2]}{uid[3]}"}, headers={ "Authorization": f"Bearer {API_TOKEN}"})
+      res = requests.post(f"{API_URL}/rest/tap", json={ "rfid": uid_str}, headers={ "Authorization": f"Bearer {API_TOKEN}"})
+
 
       if res.status_code != 200:
         # color the LEDs 
