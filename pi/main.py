@@ -14,6 +14,8 @@ MIFAREReader = MFRC522()
 # Welcome message
 print("Looking for cards")
 print("Press Ctrl-C to stop.")
+print(API_URL)
+print(API_TOKEN)
 
 # This loop checks for chips. If one is near it will get the UID
 try:
