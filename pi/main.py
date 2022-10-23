@@ -3,8 +3,8 @@ import time
 
 import requests
 import RPi.GPIO as GPIO
-from mfrc522 import MFRC522
 from dotenv import load_dotenv
+from mfrc522 import MFRC522
 
 load_dotenv()
 
@@ -33,7 +33,7 @@ try:
     if status == MIFAREReader.MI_OK:
      
       # Print UID
-      print(f"UID: {str(uid[0])},{str(uid[1])},{str(uid[2])},{str(uid[3])}")
+      print(f"UID: {uid[0]}{uid[1]}{uid[2]}{uid[3]}")
 
       # Send off a signal to the server
       # RestAPI to env API_URL/pi/tap POST using requests
