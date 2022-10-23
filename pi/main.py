@@ -9,7 +9,7 @@ API_URL = os.environ.get('API_URL')
 API_TOKEN = os.environ.get('API_TOKEN')
 
 # Create an object of the class MFRC522
-MIFAREReader = MFRC522.MFRC522()
+MIFAREReader = MFRC522()
 
 # Welcome message
 print("Looking for cards")
