@@ -10,10 +10,7 @@ export const buildSessionRouter = router({
   }),
 
   byUser: protectedProcedure.input(z.string()).query(({ ctx, input }) => {
-    if (
-      ctx.session.user.isAdmin ||
-      ctx.session.user.id === input
-    ) {
+    if (ctx.session.user.isAdmin || ctx.session.user.id === input) {
       return ctx.prisma.buildSession.findMany({
         where: { userId: input },
         include: { user: true },

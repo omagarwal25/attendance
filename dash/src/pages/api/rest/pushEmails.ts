@@ -43,12 +43,13 @@ export default async function userHandler(
   });
   // now we need to send an email to each user
   sessions.forEach(async (session) => {
-    const info = await transporter.sendMail({
-      from: '"Robotics Attendance <robotics_attendance@asl.org>', // sender address
+    await transporter.sendMail({
+      from: env.EMAIL_FROM, // sender address
       to: session.user.email, // list of receivers
-      subject: "Robotics Attendance", // Subject line
-      text: "Hello world?", // plain text body
-      html: `<b>Hello world?</b>`, // html body
+      subject: "Missing Attendance", // Subject line
+      html: `<b>Hey, you forgot to tap in or out to robotic. <a href="${env.NEXTAUTH_URL}/user/${session.user.id}" target="_blank" rel="noreferrer noopener" >Click here to fix it.</a></b>`, // plain text body
     });
   });
+
+  res.status(200).end();
 }
