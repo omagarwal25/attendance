@@ -1,12 +1,12 @@
 name: Daily
 on:
   schedule:
-    - cron: '40 8 * * *'
+    - cron: '50 8 * * *'
 jobs:
   cron:
     runs-on: ubuntu-latest
     steps:
-      - name: Hourly cron job
+      - name: Daily Cron
         run: |
           curl --request POST \
           --url 'https://attendance-griffins.vercel.app/api/rest/pushEmails' \
