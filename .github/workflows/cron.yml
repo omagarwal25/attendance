@@ -1,0 +1,13 @@
+name: Daily
+on:
+  schedule:
+    - cron: '50 8 * * *'
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Daily Cron
+        run: |
+          curl --request POST \
+          --url 'https://attendance-griffins.vercel.app/api/rest/pushEmails' \
+          --header 'Authorization: Bearer ${{ secrets.ACTION_KEY }}'
