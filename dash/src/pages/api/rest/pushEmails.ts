@@ -17,13 +17,19 @@ export default async function userHandler(
 
   if (token !== env.GH_ACTIONS_BEARER_TOKEN) return res.status(401).end();
 
+  const yesterday = new Date();
+
+  yesterday.setDate(yesterday.getDate() - 1);
+  // set the time to 00:00
+  yesterday.setHours(0, 0, 0, 0);
+
   // get all the sessions from the past 24 where the endAt is null
 
   const sessions = await prisma.buildSession.findMany({
     where: {
       startAt: {
         // the start is greater than 24 hours ago
-        gte: new Date(new Date().setHours(new Date().getHours() - 24)),
+        gte: yesterday,
       },
       // the end is null
       endAt: null,
