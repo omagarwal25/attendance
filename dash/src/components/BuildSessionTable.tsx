@@ -12,36 +12,63 @@ export const BuildSessionTable: FC<{
   sessions: (BuildSession & { user: User })[];
 }> = ({ sessions }) => {
   const { data } = useSession();
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const isAdmin = data?.user?.isAdmin ?? false;
+  const router = useRouter();
+  const isOnUserPage = router.pathname === "/user/[userId]";
+
+  const showUserColumn = !isOnUserPage && isAdmin;
 
   return (
     <table className="table-auto">
-      <thead>
+      <thead className="bg-gray-300">
         <tr>
-          {isAdmin && <th>User</th>}
+          {showUserColumn && <th>User</th>}
           <th>Date</th>
           <th>Start At</th>
           <th>Start End</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {sessions.map((session) => (
           <BuildSessionTableRow
             key={session.id}
+            showUserColumn={showUserColumn}
             session={session}
             isAdmin={isAdmin}
           />
         ))}
+        {isAdmin && (
+          <tr>
+            {!showAddForm ? (
+              <td colSpan={showUserColumn ? 5 : 4}>
+                <div className="flex items-center justify-center">
+                  <Icon
+                    icon="heroicons:plus-circle-solid"
+                    onClick={() => setShowAddForm(true)}
+                    className="cursor-pointer text-2xl"
+                  />
+                </div>
+              </td>
+            ) : (
+              <div></div>
+            )}
+          </tr>
+        )}
       </tbody>
     </table>
   );
 };
 
-const BuildSessionTableRow: FC<{ session: Row; isAdmin: boolean }> = ({
-  session,
-  isAdmin,
-}) => {
+// const CreateBuildSession: FC<{ session: Row }> = ({ session }) => {
+
+const BuildSessionTableRow: FC<{
+  session: Row;
+  isAdmin: boolean;
+  showUserColumn: boolean;
+}> = ({ session, isAdmin, showUserColumn }) => {
   const [editMode, setEditMode] = useState(false);
 
   const deleteSession = trpc.buildSession.delete.useMutation();
@@ -50,8 +77,14 @@ const BuildSessionTableRow: FC<{ session: Row; isAdmin: boolean }> = ({
   // if the edit mode is true we must have the start and end times be editable.
 
   return (
-    <tr>
-      {isAdmin && (
+    <tr
+      className={
+        session.manual && isAdmin
+          ? "bg-yellow-200"
+          : "odd:bg-gray-200 even:bg-gray-100"
+      }
+    >
+      {showUserColumn && (
         <td>
           <Link href={`/user/${session.user.id}`}>
             <a className="underline">{session.user.email}</a>
@@ -100,7 +133,7 @@ const BuildSessionTableRow: FC<{ session: Row; isAdmin: boolean }> = ({
               icon="heroicons:trash-solid"
               className="cursor-pointer text-2xl"
               onClick={async () => {
-                await deleteSession.mutate(session.id);
+                await deleteSession.mutateAsync(session.id);
                 router.reload();
               }}
             />

@@ -45,13 +45,15 @@ export default function UserPage() {
   });
 
   return (
-    <div className="flex flex-col gap-2 p-2">
-      <span className="text-2xl">
-        {sessions[0]?.user.email}&apos;s Sessions
-      </span>
-      <div className="grid grid-cols-2">
+    <div className="p-2">
+      <div className="grid grid-cols-2 gap-2">
+        <span className="col-span-2 text-2xl">
+          {sessions[0]?.user.email}&apos;s Sessions
+        </span>
         <BuildSessionTable sessions={sessions} />
-        Total Hours: {leaderboard.data.hours.toFixed(2)}
+        <span className="p-2">
+          Total Hours: {leaderboard.data.hours.toFixed(2)}
+        </span>
       </div>
     </div>
   );
