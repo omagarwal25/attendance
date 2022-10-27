@@ -7,13 +7,16 @@ export const Nav = () => {
   const { data: session, status } = useSession();
 
   const signedIn = status === "authenticated" && session;
+  const isAdmin = session?.user?.isAdmin ?? false;
 
   return (
     <nav className="flex flex-wrap items-center justify-between bg-gray-800 p-4">
       <div className="mr-6 flex w-full flex-shrink-0 items-center gap-2 text-white">
-        <span className="grow text-xl font-semibold tracking-tight">
-          Attendance App
-        </span>
+        <Link href="/" passHref>
+          <a className="grow text-xl font-semibold tracking-tight">
+            Attendance App
+          </a>
+        </Link>
         {/** If Signed in Show Signout, otherwise show signout */}
         {signedIn ? (
           <>
@@ -24,9 +27,7 @@ export const Nav = () => {
               Sign Out ({session.user?.email})
             </button>
             <button>
-              <Link href="/user/[userId]" as={`/user/${session.user?.id}`}>
-                <a>See My Hours</a>
-              </Link>
+              <Link href={`/user/${session.user?.id}`}>See My Hours</Link>
             </button>
           </>
         ) : (
@@ -37,6 +38,7 @@ export const Nav = () => {
             Sign In
           </button>
         )}
+        {isAdmin && <Link href="/admin">Admin</Link>}
       </div>
     </nav>
   );
