@@ -349,20 +349,20 @@ const TableRow: FC<{
                 hour: "2-digit",
               })
             ) : (
-              <>
-                <span className="flex items-center gap-1 text-red-500">
-                  None
-                  {!isAdmin && (
-                    <Icon
-                      icon="heroicons:pencil-square-20-solid"
-                      onClick={() => setEditMode(true)}
-                    />
-                  )}
-                </span>
-                {/** Make this ediable eventually */}
-              </>
+              <span className="flex items-center gap-1 text-red-500">None</span>
             )}
           </td>
+          {!isAdmin && (
+            <span className="flex items-center ">
+              {!isAdmin && !session.endAt && (
+                <Icon
+                  icon="heroicons:pencil-square-20-solid"
+                  className="cursor-pointer text-2xl text-red-500"
+                  onClick={() => setEditMode(true)}
+                />
+              )}
+            </span>
+          )}
           {isAdmin && (
             <>
               <span className="flex items-center">
