@@ -42,10 +42,17 @@ export default async function userHandler(
   const transporter = nodemailer.createTransport({
     host: env.EMAIL_SERVER_HOST,
     port: parseInt(env.EMAIL_SERVER_PORT),
+    requireTLS: true,
+    secure: true,
     auth: {
+      // credentials: {
+      //   pass: env.EMAIL_SERVER_PASSWORD,
+      //   user: env.EMAIL_SERVER_USER,
+      // },
       user: env.EMAIL_SERVER_USER,
       pass: env.EMAIL_SERVER_PASSWORD,
     },
+    from: env.EMAIL_FROM,
   });
   // now we need to send an email to each user
   sessions.forEach(async (session) => {

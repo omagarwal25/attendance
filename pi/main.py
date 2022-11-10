@@ -32,7 +32,7 @@ try:
     # If we have the UID, continue
     if status == MIFAREReader.MI_OK:
       # Print UID
-      print(f"UID: {uid[0]}{uid[1]}{uid[2]}{uid[3]}")
+      print(f"UID: {uid[0]}|{uid[1]}|{uid[2]}|{uid[3]}")
 
       # hash + salt the uid
       uid_str = f"{uid[0]}{uid[1]}{uid[2]}{uid[3]}"
