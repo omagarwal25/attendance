@@ -33,7 +33,14 @@ try:
     if status == MIFAREReader.MI_OK:
       # Print UID
       print(f"UID: {uid[0]}|{uid[1]}|{uid[2]}|{uid[3]}")
-      print(f"{uid}")
+
+      # for each element in uid, convert to hex and add to uid_string
+      uid_string = ""
+      for element in uid:
+        uid_string += format(element, '02x')
+        uid_string += " "
+
+      print(f"UID: {uid_string}")
 
       # hash + salt the uid
       uid_str = f"{uid[0]}{uid[1]}{uid[2]}{uid[3]}"
