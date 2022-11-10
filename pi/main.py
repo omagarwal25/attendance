@@ -24,7 +24,7 @@ print(API_TOKEN)
 try:
   while True:
     # Scan for cards
-    (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQALL)
+    (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_READ)
 
     # Get the UID of the card
     (status,uid) = MIFAREReader.MFRC522_Anticoll()
