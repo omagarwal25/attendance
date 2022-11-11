@@ -32,8 +32,6 @@ try:
     # If we have the UID, continue
     if status == MIFAREReader.MI_OK:
       # Print UID
-      print(f"UID: {uid[0]}|{uid[1]}|{uid[2]}|{uid[3]}")
-
       # for each element in uid, convert to hex and add to uid_string
       uid_string = ""
       for element in uid:
@@ -41,11 +39,8 @@ try:
         uid_string += " "
 
       print(f"UID: {uid_string}")
-
-      # hash + salt the uid
-      uid_str = f"{uid[0]}{uid[1]}{uid[2]}{uid[3]}"
       
-      res = requests.post(f"{API_URL}/rest/tap", json={ "rfid": uid_str}, headers={ "Authorization": f"Bearer {API_TOKEN}"})
+      res = requests.post(f"{API_URL}/rest/tap", json={ "rfid": uid_string}, headers={ "Authorization": f"Bearer {API_TOKEN}"})
 
       if res.status_code != 200:
         # color the LEDs 
