@@ -1,0 +1,1 @@
+PYTHONPATH=/home/pi/.local/lib/python3.7/site-packages python3 /home/pi/attendance/pi/main.py

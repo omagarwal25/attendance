@@ -22,30 +22,34 @@ print(API_TOKEN)
 
 # This loop checks for chips. If one is near it will get the UID
 try:
-  while True:
-    # Scan for cards
-    (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
+    while True:
+        # Scan for cards
+        (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
 
-    # Get the UID of the card
-    (status,uid) = MIFAREReader.MFRC522_Anticoll()
+        # Get the UID of the card
+        (status, uid) = MIFAREReader.MFRC522_Anticoll()
 
-    # If we have the UID, continue
-    if status == MIFAREReader.MI_OK:
-      # Print UID
-      print(f"UID: {uid[0]}{uid[1]}{uid[2]}{uid[3]}")
+        # If we have the UID, continue
+        if status == MIFAREReader.MI_OK:
+            # Print UID
+            # for each element in uid, convert to hex and add to uid_string
+            uid_string = ""
+            for element in uid:
+                uid_string += format(element, '02x')
+                uid_string += " "
 
-      # hash + salt the uid
-      uid_str = f"{uid[0]}{uid[1]}{uid[2]}{uid[3]}"
-      
-      # grab the user's email
-      email = input("Enter your email: ")
+            print(f"UID: {uid_string}")
 
-      res = requests.post(f"{API_URL}/rest/register", json={ "rfid": uid_str, "email": email }, headers={ "Authorization": f"Bearer {API_TOKEN}" })
+            # grab the user's email
+            email = input("Enter your email: ")
 
-      print("Registration successful!")
+            res = requests.post(f"{API_URL}/rest/register", json={"rfid": uid_string,
+                                "email": email}, headers={"Authorization": f"Bearer {API_TOKEN}"})
 
-      time.sleep(1)
-      # Reset LEDs
+            print("Registration successful!")
+
+            time.sleep(1)
+            # Reset LEDs
 
 except KeyboardInterrupt:
-  GPIO.cleanup()
+    GPIO.cleanup()
