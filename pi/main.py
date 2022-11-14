@@ -57,9 +57,9 @@ try:
         # If we have the UID, continue
         if status == MIFAREReader.MI_OK:
             # Print UID
-            # for each element in uid, convert to hex and add to uid_string
+            # for each element in uid except the last, convert to hex and add to uid_string
             uid_string = ""
-            for element in uid:
+            for element in uid[:-1]:
                 uid_string += format(element, '02x')
                 uid_string += " "
 
