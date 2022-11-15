@@ -1,4 +1,3 @@
-import argon2 from "argon2";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { env } from "~env/server.mjs";
 import { prisma } from "~server/db/client";
@@ -23,20 +22,20 @@ export default async function userHandler(
   const rfid: string = req.body.rfid as string;
   const email: string = req.body.email as string;
 
-  // const tag = await prisma.tag.findUnique({
-  //   where: {
-  //     uuid: rfid,
-  //   },
-  // });
+  const tag = await prisma.tag.findUnique({
+    where: {
+      uuid: rfid,
+    },
+  });
 
-  const tags = await prisma.tag.findMany({});
-  console.log(tags);
-  const tagMap = await Promise.all(
-    tags.map((tag) => argon2.verify(tag.uuid, rfid))
-  );
+  // const tags = await prisma.tag.findMany({});
+  // console.log(tags);
+  // const tagMap = await Promise.all(
+  //   tags.map((tag) => argon2.verify(tag.uuid, rfid))
+  // );
 
-  const index = tagMap.indexOf(true);
-  const tag = tags[index];
+  // const index = tagMap.indexOf(true);
+  // const tag = tags[index];
 
   if (tag) {
     // if the tag is in the database, update the email
@@ -63,7 +62,7 @@ export default async function userHandler(
 
   await prisma.tag.create({
     data: {
-      uuid: await argon2.hash(rfid),
+      uuid: rfid,
       user: {
         connectOrCreate: {
           where: {

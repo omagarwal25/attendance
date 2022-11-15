@@ -1,3 +1,4 @@
+import argon2 from "argon2";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { env } from "~env/server.mjs";
 import { prisma } from "~server/db/client";
@@ -38,12 +39,11 @@ export default async function userHandler(
   // });
   // console.log(tags);
   // const tagMap = await Promise.all(
-  //   tags.map(async (tag) => ({
-  //     match: await argon2.verify(tag.uuid, rfid),
-  //     id: tag.id,
-  //     user: tag.user,
-  //   }))
+  //   tags.map((tag) => argon2.verify(tag.uuid, rfid))
   // );
+
+  // const index = tagMap.indexOf(true);
+  // const tag = tags[index];
 
   // const tag = tagMap.find((tag) => tag.match);
 
