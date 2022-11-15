@@ -1,4 +1,3 @@
-import argon2 from "argon2";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { env } from "~env/server.mjs";
 import { prisma } from "~server/db/client";
@@ -22,31 +21,31 @@ export default async function userHandler(
   const rfid: string = req.body.rfid as string;
 
   // find the user with the rfid
-  // const tag = await prisma.tag.findUnique({
-  //   where: {
-  //     uuid: hashed,
-  //   },
-  //   include: {
-  //     user: true,
-  //   },
-  // });
-
-  // because we are using argon2, we need to use it to compare the rfid
-  const tags = await prisma.tag.findMany({
+  const tag = await prisma.tag.findUnique({
+    where: {
+      uuid: hashed,
+    },
     include: {
       user: true,
     },
   });
-  console.log(tags);
-  const tagMap = await Promise.all(
-    tags.map(async (tag) => ({
-      match: await argon2.verify(tag.uuid, rfid),
-      id: tag.id,
-      user: tag.user,
-    }))
-  );
 
-  const tag = tagMap.find((tag) => tag.match);
+  // because we are using argon2, we need to use it to compare the rfid
+  // const tags = await prisma.tag.findMany({
+  //   include: {
+  //     user: true,
+  //   },
+  // });
+  // console.log(tags);
+  // const tagMap = await Promise.all(
+  //   tags.map(async (tag) => ({
+  //     match: await argon2.verify(tag.uuid, rfid),
+  //     id: tag.id,
+  //     user: tag.user,
+  //   }))
+  // );
+
+  // const tag = tagMap.find((tag) => tag.match);
 
   const user = tag?.user;
 

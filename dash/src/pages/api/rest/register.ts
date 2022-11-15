@@ -23,16 +23,20 @@ export default async function userHandler(
   const rfid: string = req.body.rfid as string;
   const email: string = req.body.email as string;
 
-  const tags = await prisma.tag.findMany({});
-  console.log(tags);
-  const tagMap = await Promise.all(
-    tags.map(async (tag) => ({
-      match: await argon2.verify(tag.uuid, rfid),
-      id: tag.id,
-    }))
-  );
+  const tag = await prisma.tag.findUnique({
+    where: {
+      uuid: rfid,
+    },
+  });
+  // console.log(tags);
+  // const tagMap = await Promise.all(
+  //   tags.map(async (tag) => ({
+  //     match: await argon2.verify(tag.uuid, rfid),
+  //     id: tag.id,
+  //   }))
+  // );
 
-  const tag = tagMap.find((tag) => tag.match);
+  // const tag = tagMap.find((tag) => tag.match);
 
   if (tag) {
     // if the tag is in the database, update the email
