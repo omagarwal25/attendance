@@ -23,7 +23,7 @@ export default async function userHandler(
   // find the user with the rfid
   const tag = await prisma.tag.findUnique({
     where: {
-      uuid: hashed,
+      uuid: rfid,
     },
     include: {
       user: true,
