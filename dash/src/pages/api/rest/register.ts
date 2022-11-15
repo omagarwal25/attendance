@@ -30,7 +30,7 @@ export default async function userHandler(
   // });
 
   const tags = await prisma.tag.findMany({});
-  // console.log(tags);
+  console.log(tags);
   const tagMap = await Promise.all(
     tags.map((tag) => argon2.verify(tag.uuid, rfid))
   );
