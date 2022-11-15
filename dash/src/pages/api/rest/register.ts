@@ -1,4 +1,3 @@
-import argon2 from "argon2";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { env } from "~env/server.mjs";
 import { prisma } from "~server/db/client";
@@ -63,7 +62,7 @@ export default async function userHandler(
 
   await prisma.tag.create({
     data: {
-      uuid: await argon2.hash(rfid),
+      uuid: rfid,
       user: {
         connectOrCreate: {
           where: {
