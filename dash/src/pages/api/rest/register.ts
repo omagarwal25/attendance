@@ -24,7 +24,9 @@ export default async function userHandler(
   const email: string = req.body.email as string;
 
   const tags = await prisma.tag.findMany({});
+  console.log(tags);
   const tag = tags.find((tag) => argon2.verify(tag.uuid, rfid));
+  console.log(tag);
 
   if (tag) {
     // if the tag is in the database, update the email

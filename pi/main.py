@@ -61,7 +61,7 @@ try:
             uid_string = ""
             for element in uid[:-1]:
                 uid_string += format(element, '02x')
-                uid_string += " "
+                # uid_string += " "
 
             print(f"UID: {uid_string}")
 
