@@ -38,7 +38,7 @@ export default async function userHandler(
     },
   });
 
-  const tag = tags.find((tag) => argon2.verify(tag.uuid, rfid));
+  const tag = tags.find(async (tag) => await argon2.verify(tag.uuid, rfid));
 
   const user = tag?.user;
 
