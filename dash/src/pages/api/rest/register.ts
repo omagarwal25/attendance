@@ -25,10 +25,14 @@ export default async function userHandler(
 
   const tags = await prisma.tag.findMany({});
   console.log(tags);
-  const map = tags.map(async (tag) => await argon2.verify(tag.uuid, rfid));
-  console.log(map);
-  const tag = tags.find(async (tag) => await argon2.verify(tag.uuid, rfid));
-  console.log(tag);
+  const tagMap = await Promise.all(
+    tags.map(async (tag) => ({
+      match: await argon2.verify(tag.uuid, rfid),
+      id: tag.id,
+    }))
+  );
+
+  const tag = tagMap.find((tag) => tag.match);
 
   if (tag) {
     // if the tag is in the database, update the email

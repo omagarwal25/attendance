@@ -37,8 +37,16 @@ export default async function userHandler(
       user: true,
     },
   });
+  console.log(tags);
+  const tagMap = await Promise.all(
+    tags.map(async (tag) => ({
+      match: await argon2.verify(tag.uuid, rfid),
+      id: tag.id,
+      user: tag.user,
+    }))
+  );
 
-  const tag = tags.find(async (tag) => await argon2.verify(tag.uuid, rfid));
+  const tag = tagMap.find((tag) => tag.match);
 
   const user = tag?.user;
 
