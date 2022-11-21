@@ -68,10 +68,10 @@ try:
 
             print(f"UID: {uid_string}")
 
+            GPIO.output(led, 1)
+            
             res = requests.post(f"{API_URL}/rest/tap", json={"rfid": uid_string},
                                 headers={"Authorization": f"Bearer {API_TOKEN}"})
-
-            GPIO.output(led, 1)
 
             if res.status_code != 200:
                 # RGBLight.setColor(255, 0, 0)
