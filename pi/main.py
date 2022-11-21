@@ -79,7 +79,7 @@ try:
             print(f"UID: {uid_string}")
 
             # Yellow Light
-            RGBLight.setColor(255, 127, 0)
+            RGBLight.setColor(255, 100, 0)
 
             res = requests.post(f"{API_URL}/rest/tap", json={"rfid": uid_string},
                                 headers={"Authorization": f"Bearer {API_TOKEN}"})
@@ -87,8 +87,6 @@ try:
             if res.status_code != 200:
                 # Red Flash
                 RGBLight.setColor(255, 0, 0)
-                time.sleep(0.2)
-                RGBLight.turnOff()
                 print(f"Error: {res.status_code}")
             else:
                 is_tap_in: bool = res.json().get('start')
