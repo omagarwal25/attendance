@@ -78,7 +78,7 @@ try:
                 print(f"Error: {res.status_code}")
 
                 GPIO.output(led, 0)
-                time.sleep(1)
+                time.sleep(0.2)
                 GPIO.output(led, 1)
             else:
                 is_tap_in: bool = res.json().get('start')
