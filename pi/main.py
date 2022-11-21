@@ -14,9 +14,9 @@ def map(x: int, in_min: int, in_max: int, out_min: int, out_max: int) -> int:
 class RGB:
     def __init__(self, rPin: int, gPin: int, bPin: int) -> None:
         GPIO.setmode(GPIO.BCM)
-        self.rPin = GPIO.PWM(self.rPin, 2000)
-        self.gPin = GPIO.PWM(self.gPin, 2000)
-        self.bPin = GPIO.PWM(self.bPin, 2000)
+        self.rPin = GPIO.PWM(rPin, 2000)
+        self.gPin = GPIO.PWM(gPin, 2000)
+        self.bPin = GPIO.PWM(bPin, 2000)
 
         self.rPin.start(0)
         self.gPin.start(0)
