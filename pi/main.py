@@ -19,7 +19,7 @@ class RGB:
         GPIO.setup(self.gPin, GPIO.OUT)
         GPIO.setup(self.bPin, GPIO.OUT)
 
-    def setColor(self, r: int, g: int, b: int) -> None:
+    def setColor(self, r: float, g: float, b: float) -> None:
         GPIO.output(self.rPin, r)
         GPIO.output(self.gPin, g)
         GPIO.output(self.bPin, b)
@@ -69,7 +69,7 @@ try:
             print(f"UID: {uid_string}")
 
             # Yellow Light
-            RGBLight.setColor(1, 1, 0)
+            RGBLight.setColor(1, 0.647058823529, 0)
 
             res = requests.post(f"{API_URL}/rest/tap", json={"rfid": uid_string},
                                 headers={"Authorization": f"Bearer {API_TOKEN}"})
