@@ -13,25 +13,26 @@ def map(x: int, in_min: int, in_max: int, out_min: int, out_max: int) -> int:
 
 class RGB:
     def __init__(self, rPin: int, gPin: int, bPin: int) -> None:
-        self.rPin = rPin
-        self.gPin = gPin
-        self.bPin = bPin
-
         GPIO.setmode(GPIO.BCM)
+        self.rPin = GPIO.PWM(self.rPin, 2000)
+        self.gPin = GPIO.PWM(self.gPin, 2000)
+        self.bPin = GPIO.PWM(self.bPin, 2000)
+
+        self.rPin.start(0)
+        self.gPin.start(0)
+        self.bPin.start(0)
+
         # GPIO.setwarnings(False)
-        GPIO.PWM(self.rPin, 2000)
-        GPIO.PWM(self.gPin, 2000)
-        GPIO.PWM(self.bPin, 2000)
 
     def setColor(self, r: int, g: int, b: int) -> None:
-        GPIO.ChangeActiveDutyCycle(self.rPin, 100-map(r, 0, 255, 0, 100))
-        GPIO.ChangeActiveDutyCycle(self.gPin, 100-map(g, 0, 255, 0, 100))
-        GPIO.ChangeActiveDutyCycle(self.bPin, 100-map(b, 0, 255, 0, 100))
+        self.rPin.ChangeActiveDutyCycle(100-map(r, 0, 255, 0, 100))
+        self.gPin.ChangeActiveDutyCycle(100-map(g, 0, 255, 0, 100))
+        self.bPin.ChangeActiveDutyCycle(100-map(b, 0, 255, 0, 100))
 
     def turnOff(self) -> None:
-        GPIO.output(self.rPin, 0)
-        GPIO.output(self.gPin, 0)
-        GPIO.output(self.bPin, 0)
+        self.rPin.ChangeActiveDutyCycle(0)
+        self.gPin.ChangeActiveDutyCycle(0)
+        self.bPin.ChangeActiveDutyCycle(0)
 
 
 GPIO.setmode(GPIO.BCM)
