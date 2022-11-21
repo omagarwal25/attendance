@@ -7,6 +7,10 @@ from dotenv import load_dotenv
 from mfrc522 import MFRC522
 
 
+def map(x: int, in_min: int, in_max: int, out_min: int, out_max: int) -> int:
+    return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
+
+
 class RGB:
     def __init__(self, rPin: int, gPin: int, bPin: int) -> None:
         self.rPin = rPin
@@ -15,14 +19,14 @@ class RGB:
 
         GPIO.setmode(GPIO.BCM)
         # GPIO.setwarnings(False)
-        GPIO.setup(self.rPin, GPIO.OUT)
-        GPIO.setup(self.gPin, GPIO.OUT)
-        GPIO.setup(self.bPin, GPIO.OUT)
+        GPIO.PWM(self.rPin, 2000)
+        GPIO.PWM(self.gPin, 2000)
+        GPIO.PWM(self.bPin, 2000)
 
-    def setColor(self, r: float, g: float, b: float) -> None:
-        GPIO.output(self.rPin, r)
-        GPIO.output(self.gPin, g)
-        GPIO.output(self.bPin, b)
+    def setColor(self, r: int, g: int, b: int) -> None:
+        GPIO.ChangeActiveDutyCycle(self.rPin, 100-map(r, 0, 255, 0, 100))
+        GPIO.ChangeActiveDutyCycle(self.gPin, 100-map(g, 0, 255, 0, 100))
+        GPIO.ChangeActiveDutyCycle(self.bPin, 100-map(b, 0, 255, 0, 100))
 
     def turnOff(self) -> None:
         GPIO.output(self.rPin, 0)
@@ -69,23 +73,23 @@ try:
             print(f"UID: {uid_string}")
 
             # Yellow Light
-            RGBLight.setColor(1, 0.847058823529, 0)
+            RGBLight.setColor(255, 163, 0)
 
             res = requests.post(f"{API_URL}/rest/tap", json={"rfid": uid_string},
                                 headers={"Authorization": f"Bearer {API_TOKEN}"})
 
             if res.status_code != 200:
                 # Red Flash
-                RGBLight.setColor(1, 0, 0)
+                RGBLight.setColor(255, 0, 0)
                 time.sleep(0.2)
                 RGBLight.turnOff()
                 print(f"Error: {res.status_code}")
             else:
                 is_tap_in: bool = res.json().get('start')
                 if is_tap_in:
-                    RGBLight.setColor(0, 1, 0)
+                    RGBLight.setColor(0, 255, 0)
                 else:
-                    RGBLight.setColor(0, 0, 1)
+                    RGBLight.setColor(0, 0, 255)
 
                 time.sleep(0.2)
                 RGBLight.turnOff()
