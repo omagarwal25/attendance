@@ -30,14 +30,14 @@ class RGB:
         # GPIO.setwarnings(False)
 
     def setColor(self, r: int, g: int, b: int) -> None:
-        self.rPin.ChangeActiveDutyCycle(100-map(r, 0, 255, 0, 100))
-        self.gPin.ChangeActiveDutyCycle(100-map(g, 0, 255, 0, 100))
-        self.bPin.ChangeActiveDutyCycle(100-map(b, 0, 255, 0, 100))
+        self.rPin.ChangeDutyCycle(100-map(r, 0, 255, 0, 100))
+        self.gPin.ChangeDutyCycle(100-map(g, 0, 255, 0, 100))
+        self.bPin.ChangeDutyCycle(100-map(b, 0, 255, 0, 100))
 
     def turnOff(self) -> None:
-        self.rPin.ChangeActiveDutyCycle(0)
-        self.gPin.ChangeActiveDutyCycle(0)
-        self.bPin.ChangeActiveDutyCycle(0)
+        self.rPin.ChangeDutyCycle(0)
+        self.gPin.ChangeDutyCycle(0)
+        self.bPin.ChangeDutyCycle(0)
 
 
 GPIO.setmode(GPIO.BCM)
