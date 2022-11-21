@@ -56,7 +56,7 @@ print("Press Ctrl-C to stop.")
 print(API_URL)
 print(API_TOKEN)
 
-RGBLight = RGB(20, 21, 26)
+RGBLight = RGB(26, 21, 20)
 
 # This loop checks for chips. If one is near it will get the UID
 try:
