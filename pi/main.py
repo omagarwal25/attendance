@@ -95,8 +95,9 @@ try:
                 else:
                     RGBLight.setColor(0, 0, 255)
 
-                time.sleep(0.2)
-                RGBLight.turnOff()
+            time.sleep(0.2)
+            RGBLight.turnOff()
+            time.sleep(0.5)
 
 
 except KeyboardInterrupt:
