@@ -58,6 +58,15 @@ print(API_TOKEN)
 
 RGBLight = RGB(26, 21, 20)
 
+# flash to show ready
+RGBLight.setColor(255, 255, 255)
+time.sleep(0.5)
+RGBLight.turnOff()
+time.sleep(0.5)
+RGBLight.setColor(255, 255, 255)
+time.sleep(0.5)
+RGBLight.turnOff()
+
 # This loop checks for chips. If one is near it will get the UID
 try:
     while True:

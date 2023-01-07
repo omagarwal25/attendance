@@ -1,5 +1,5 @@
-import argon2 from "argon2";
 import type { NextApiRequest, NextApiResponse } from "next";
+import nodemailer from "nodemailer";
 import { env } from "~env/server.mjs";
 import { prisma } from "~server/db/client";
 
@@ -49,7 +49,31 @@ export default async function userHandler(
 
   const user = tag?.user;
 
-  if (!user) return res.status(404).json({ error: "User not found" });
+  if (!user) {
+    const transporter = nodemailer.createTransport({
+      host: env.EMAIL_SERVER_HOST,
+      port: parseInt(env.EMAIL_SERVER_PORT),
+      requireTLS: true,
+      secure: true,
+      auth: {
+        // credentials: {
+        //   pass: env.EMAIL_SERVER_PASSWORD,
+        //   user: env.EMAIL_SERVER_USER,
+        // },
+        user: env.EMAIL_SERVER_USER,
+        pass: env.EMAIL_SERVER_PASSWORD,
+      },
+      from: env.EMAIL_FROM,
+    });
+
+    await transporter.sendMail({
+      to: env.EMAIL_TO,
+      subject: "RFID Not Found",
+      text: `RFID: ${rfid}`,
+    });
+
+    return res.status(404).json({ error: "User not found" });
+  }
 
   // alright we have the user now. Let's filter their sessions
 
