@@ -420,7 +420,7 @@ const EditRow: FC<{ session: Row; onCloseEdit: () => void }> = ({
     endAtDate.setMinutes(endAt.minutes);
 
     // verify that the start time is before the end time.
-    if (endAt && startAtDate > endAtDate) {
+    if (endAt.hours !== 0 && endAt.minutes !== 0 && startAtDate > endAtDate) {
       alert("Start time must be before end time");
       return;
     }
@@ -430,7 +430,7 @@ const EditRow: FC<{ session: Row; onCloseEdit: () => void }> = ({
       id: session.id,
       data: {
         startAt: startAtDate,
-        endAt: endAtDate,
+        endAt: endAt.hours !== 0 && endAt.minutes !== 0 ? null : endAtDate,
       },
     });
 
