@@ -39,7 +39,7 @@ export const buildSessionRouter = router({
       if (!session) throw new TRPCError({ code: "NOT_FOUND" });
 
       if (
-        ctx.session.user.email !== env.ADMIN_EMAIL &&
+        !env.ADMIN_EMAIL.includes(ctx.session.user.email) &&
         ctx.session.user.id !== session.userId
       )
         throw new TRPCError({ code: "UNAUTHORIZED" });
