@@ -67,6 +67,7 @@ export default function AdminPage() {
           <table className="w-full table-auto">
             <thead className="bg-gray-300">
               <tr>
+                <th>Rank</th>
                 <th>Username</th>
                 <th>Hours</th>
               </tr>
@@ -74,6 +75,7 @@ export default function AdminPage() {
             <tbody>
               {leaderboardSorted.map((user) => (
                 <tr key={user.id} className="odd:bg-gray-200 even:bg-gray-100">
+                  <td>{leaderboardSorted.indexOf(user) + 1}</td>
                   <td className="underline">
                     <Link href={`/user/${user.id}`}>{user.email}</Link>
                   </td>
