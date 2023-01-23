@@ -68,6 +68,28 @@ time.sleep(0.5)
 RGBLight.turnOff()
 
 # This loop checks for chips. If one is near it will get the UID
+
+while True:
+    # ping 1.1.1.1 to check internet connection
+    response = os.system("ping -c 1.1.1.1")
+
+    # and then check the response...
+    if response == 0:
+        print("Internet Connected")
+        break
+    else:
+        print("No Internet")
+        time.sleep(1)
+
+# flash to show ready
+RGBLight.setColor(0, 255, 255)
+time.sleep(0.5)
+RGBLight.turnOff()
+time.sleep(0.5)
+RGBLight.setColor(0, 255, 255)
+time.sleep(0.5)
+RGBLight.turnOff()
+
 try:
     while True:
         # Scan for cards
