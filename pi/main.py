@@ -71,7 +71,7 @@ RGBLight.turnOff()
 
 while True:
     # ping 1.1.1.1 to check internet connection
-    response = os.system("ping -c 1.1.1.1")
+    response = os.system("ping -c 1 1.1.1.1")
 
     # and then check the response...
     if response == 0:
