@@ -60,11 +60,11 @@ RGBLight = RGB(26, 21, 20)
 
 # flash to show ready
 RGBLight.setColor(255, 255, 255)
-time.sleep(0.5)
+time.sleep(1)
 RGBLight.turnOff()
-time.sleep(0.5)
+time.sleep(1)
 RGBLight.setColor(255, 255, 255)
-time.sleep(0.5)
+time.sleep(1)
 RGBLight.turnOff()
 
 # This loop checks for chips. If one is near it will get the UID
@@ -83,11 +83,11 @@ while True:
 
 # flash to show ready
 RGBLight.setColor(0, 255, 255)
-time.sleep(0.5)
+time.sleep(1)
 RGBLight.turnOff()
-time.sleep(0.5)
+time.sleep(1)
 RGBLight.setColor(0, 255, 255)
-time.sleep(0.5)
+time.sleep(1)
 RGBLight.turnOff()
 
 try:
