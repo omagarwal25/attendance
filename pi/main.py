@@ -35,7 +35,7 @@ class RGB:
         self.bPin.ChangeDutyCycle(map(b, 0, 255, 0, 100))
 
     def turnOff(self) -> None:
-        setColor(0, 0, 0)
+        self.setColor(0, 0, 0)
 
 
 GPIO.setmode(GPIO.BCM)
