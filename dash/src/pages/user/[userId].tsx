@@ -84,7 +84,7 @@ const ColorPicker = ({ submit }: { submit: (color: Color[]) => void }) => {
             setColors(newColors);
           }}
           className="rounded p-2"
-          value={color[i]}
+          value={colors[i]}
         >
           <option value="red">Red</option>
           <option value="blue">Blue</option>

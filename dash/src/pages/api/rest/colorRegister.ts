@@ -33,7 +33,7 @@ export default async function userHandler(
 
   const user = tag?.user;
 
-  if (user) return res.status(501).json({ error: "User already exists" });
+  if (user) return res.status(400).json({ error: "User already exists" });
 
   if (tag && tag.sequence) {
     return res.status(200).json({ data: tag.sequence, message: "Successful" });
