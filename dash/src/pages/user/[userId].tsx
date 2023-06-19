@@ -41,7 +41,7 @@ export default function UserPage() {
   if (!data) return <LoadingPage />;
   if (!buildSessions.data) return <LoadingPage />;
   if (!leaderboard.data) return <LoadingPage />;
-  if (!registerTag.data) return <LoadingPage />;
+  // if (!registerTag.data) return <LoadingPage />;
 
   const sessions = [...buildSessions.data].sort((a, b) => {
     if (a.startAt < b.startAt) return 1;
