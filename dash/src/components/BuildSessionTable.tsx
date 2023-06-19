@@ -23,7 +23,7 @@ export const BuildSessionTable: FC<{
   return (
     <div className="flex flex-col gap-2">
       <table className="w-full table-auto">
-        <thead className="bg-gray-300">
+        <thead className="bg-gray-200">
           <tr>
             {showUserColumn && <th>User</th>}
             <th>Date</th>
@@ -293,7 +293,7 @@ const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
           onClick={onClose}
         >
           Cancel
-          <Icon icon="heroicons:x-circle-solid" className="text-2xl " />
+          <Icon icon="heroicons:x-circle-solid" className="text-2xl" />
         </button>
         <button
           className="flex items-center gap-1 rounded-md bg-green-800 p-2 text-white disabled:cursor-not-allowed"
@@ -301,7 +301,7 @@ const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
           onClick={onSubmit}
         >
           Create
-          <Icon icon="heroicons:check-circle-solid" className="text-2xl " />
+          <Icon icon="heroicons:check-circle-solid" className="text-2xl" />
         </button>
       </span>
     </div>
@@ -353,7 +353,7 @@ const TableRow: FC<{
             )}
           </td>
           {!isAdmin && (
-            <span className="flex items-center ">
+            <span className="flex items-center">
               {!isAdmin && !session.endAt && (
                 <Icon
                   icon="heroicons:pencil-square-20-solid"

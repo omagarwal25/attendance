@@ -61,7 +61,7 @@ model Tag {
 model BuildSession {
   id      String    @id @default(cuid())
   user    User      @relation(fields: [userId], references: [id])
-  startAt DateTime?
+  startAt DateTime
   endAt   DateTime?
   userId  String
   manual  Boolean   @default(false)
