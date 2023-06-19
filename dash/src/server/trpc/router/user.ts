@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { colors } from "~utils/color";
 import { protectedProcedure, router } from "../trpc";
 import { adminProcedure } from "./../trpc";
 
@@ -17,32 +18,32 @@ export const userRouter = router({
   }),
 
   registerTag: protectedProcedure
-    .input(z.enum(["purple", "green", "blue", "red", "orange"]).array())
+    .input(z.enum(colors).array())
     .mutation(async ({ ctx, input }) => {
       const seq = input.join(",");
 
       const tag = await ctx.prisma.tag.findFirst({
         where: {
           sequence: seq,
-          user: null
-        }
-      })
+          user: null,
+        },
+      });
 
       if (!tag) {
-        throw new TRPCError({ code: "NOT_FOUND" })
+        throw new TRPCError({ code: "NOT_FOUND" });
       }
 
       return ctx.prisma.user.update({
         where: {
-          id: ctx.session.user.id
+          id: ctx.session.user.id,
         },
         data: {
           tag: {
             connect: {
-              id: tag.id
-            }
-          }
-        }
-      })
+              id: tag.id,
+            },
+          },
+        },
+      });
     }),
 });

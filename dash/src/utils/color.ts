@@ -1,13 +1,13 @@
 export type Color = "cyan" | "yellow" | "green" | "blue" | "red" | "magenta";
 
-export const colors: Color[] = [
+export const colors = [
   "cyan",
   "magenta",
   "yellow",
   "green",
   "blue",
   "red",
-];
+] as const;
 
 export const stringToColor = (str: string): Color[] => {
   const split = str.split(",");
