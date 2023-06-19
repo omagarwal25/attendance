@@ -10,9 +10,6 @@ export default function UserPage() {
   const router = useRouter();
   const { userId } = router.query;
   const { data, status } = useSession();
-  const [colors, setColors] = useState<Color[]>([]);
-
-  // TODO flash something to indicate the status of the user's RFIDs
 
   const buildSessions = trpc.buildSession.byUser.useQuery(userId as string);
   const leaderboard = trpc.leaderboard.byUser.useQuery(userId as string);
@@ -21,26 +18,30 @@ export default function UserPage() {
   if (
     status === "loading" ||
     buildSessions.status === "loading" ||
-    leaderboard.status === "loading"
+    leaderboard.status === "loading" ||
+    registerTag.status === "loading"
   ) {
     return <LoadingPage />;
   }
 
   if (
     (buildSessions.isError && buildSessions.error) ||
-    (leaderboard.isError && leaderboard.error)
+    (leaderboard.isError && leaderboard.error) ||
+    (registerTag.isError && registerTag.error)
   ) {
     if (
       buildSessions.error?.data?.code === "UNAUTHORIZED" ||
-      leaderboard.error?.data?.code === "UNAUTHORIZED"
+      leaderboard.error?.data?.code === "UNAUTHORIZED" ||
+      registerTag.error?.data?.code === "UNAUTHORIZED"
     ) {
       return <div>Unauthorized</div>;
-    }
+    } else return <div>Error</div>;
   }
 
   if (!data) return <LoadingPage />;
   if (!buildSessions.data) return <LoadingPage />;
   if (!leaderboard.data) return <LoadingPage />;
+  if (!registerTag.data) return <LoadingPage />;
 
   const sessions = [...buildSessions.data].sort((a, b) => {
     if (a.startAt < b.startAt) return 1;
