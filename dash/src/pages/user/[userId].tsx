@@ -74,7 +74,7 @@ const ColorPicker = ({ submit }: { submit: (color: Color[]) => void }) => {
   const [colors, setColors] = useState<Color[]>(["red", "red", "red"]);
 
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div className="flex flex-row items-center gap-2 p-2">
       {colors.map((color, i) => (
         <select
           key={i}
@@ -83,7 +83,7 @@ const ColorPicker = ({ submit }: { submit: (color: Color[]) => void }) => {
             newColors[i] = e.target.value as Color;
             setColors(newColors);
           }}
-          className="p-2"
+          className="rounded p-2"
           value={color[i]}
         >
           <option value="red">Red</option>
@@ -96,7 +96,7 @@ const ColorPicker = ({ submit }: { submit: (color: Color[]) => void }) => {
       ))}
 
       <button
-        className="bg-green-700 p-2 text-white"
+        className="rounded bg-green-700 p-2 text-white"
         onClick={() => {
           submit(colors);
         }}
