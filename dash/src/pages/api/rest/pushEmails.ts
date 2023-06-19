@@ -60,7 +60,7 @@ export default async function userHandler(
       from: env.EMAIL_FROM, // sender address
       to: session.user.email, // list of receivers
       subject: "Missing Attendance", // Subject line
-      html: `<b>Hey, you forgot to tap in or out to robotic. <a href="${env.NEXTAUTH_URL}/user/${session.user.id}" target="_blank" rel="noreferrer noopener" >Click here to fix it.</a></b>`, // plain text body
+      html: `<b>Hey, you forgot to tap in or out to robotics. <a href="${env.NEXTAUTH_URL}/user/${session.user.id}" target="_blank" rel="noreferrer noopener" >Click here to fix it.</a></b>`, // plain text body
     });
   });
 

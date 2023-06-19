@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import nodemailer from "nodemailer";
 import { env } from "~env/server.mjs";
 import { prisma } from "~server/db/client";
 
@@ -31,47 +30,31 @@ export default async function userHandler(
     },
   });
 
-  // because we are using argon2, we need to use it to compare the rfid
-  // const tags = await prisma.tag.findMany({
-  //   include: {
-  //     user: true,
-  //   },
-  // });
-  // console.log(tags);
-  // const tagMap = await Promise.all(
-  //   tags.map((tag) => argon2.verify(tag.uuid, rfid))
-  // );
-
-  // const index = tagMap.indexOf(true);
-  // const tag = tags[index];
-
-  // const tag = tagMap.find((tag) => tag.match);
-
   const user = tag?.user;
 
   if (!user) {
-    const transporter = nodemailer.createTransport({
-      host: env.EMAIL_SERVER_HOST,
-      port: parseInt(env.EMAIL_SERVER_PORT),
-      requireTLS: true,
-      secure: true,
-      auth: {
-        // credentials: {
-        //   pass: env.EMAIL_SERVER_PASSWORD,
-        //   user: env.EMAIL_SERVER_USER,
-        // },
-        user: env.EMAIL_SERVER_USER,
-        pass: env.EMAIL_SERVER_PASSWORD,
-      },
-      from: env.EMAIL_FROM,
-    });
+    // const transporter = nodemailer.createTransport({
+    //   host: env.EMAIL_SERVER_HOST,
+    //   port: parseInt(env.EMAIL_SERVER_PORT),
+    //   requireTLS: true,
+    //   secure: true,
+    //   auth: {
+    //     // credentials: {
+    //     //   pass: env.EMAIL_SERVER_PASSWORD,
+    //     //   user: env.EMAIL_SERVER_USER,
+    //     // },
+    //     user: env.EMAIL_SERVER_USER,
+    //     pass: env.EMAIL_SERVER_PASSWORD,
+    //   },
+    //   from: env.EMAIL_FROM,
+    // });
 
-    await transporter.sendMail({
-      to: env.EMAIL_TO,
-      subject: "RFID Not Found",
-      text: `RFID: ${rfid}`,
-    });
-
+    // await transporter.sendMail({
+    //   to: env.EMAIL_TO,
+    //   subject: "RFID Not Found",
+    //   text: `RFID: ${rfid}`,
+    // });
+    //
     return res.status(404).json({ error: "User not found" });
   }
 

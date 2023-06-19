@@ -1,5 +1,7 @@
 import os
 import time
+from dataclasses import dataclass
+from enum import Enum
 
 import requests
 import RPi.GPIO as GPIO
@@ -9,6 +11,24 @@ from mfrc522 import MFRC522
 
 def map(x: int, in_min: int, in_max: int, out_min: int, out_max: int) -> int:
     return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
+
+
+@dataclass
+class Color:
+    r: int
+    g: int
+    b: int
+
+
+class Colors(Enum):
+    RED = Color(255, 0, 0)
+    GREEN = Color(0, 255, 0)
+    BLUE = Color(0, 0, 255)
+    YELLOW = Color(255, 255, 0)
+    CYAN = Color(0, 255, 255)
+    MAGENTA = Color(255, 0, 255)
+    WHITE = Color(255, 255, 255)
+    BLACK = Color(0, 0, 0)
 
 
 class RGB:
@@ -29,21 +49,21 @@ class RGB:
 
         # GPIO.setwarnings(False)
 
-    def setColor(self, r: int, g: int, b: int) -> None:
-        self.rPin.ChangeDutyCycle(map(r, 0, 255, 0, 100))
-        self.gPin.ChangeDutyCycle(map(g, 0, 255, 0, 100))
-        self.bPin.ChangeDutyCycle(map(b, 0, 255, 0, 100))
+    def setColor(self, color: Color) -> None:
+        self.rPin.ChangeDutyCycle(map(color.r, 0, 255, 0, 100))
+        self.gPin.ChangeDutyCycle(map(color.g, 0, 255, 0, 100))
+        self.bPin.ChangeDutyCycle(map(color.b, 0, 255, 0, 100))
 
     def turnOff(self) -> None:
-        self.setColor(0, 0, 0)
+        self.setColor(Colors.BLACK.value)
 
 
 GPIO.setmode(GPIO.BCM)
 
 load_dotenv()
 
-API_URL = os.environ.get('API_URL')
-API_TOKEN = os.environ.get('API_TOKEN')
+API_URL = os.environ.get("API_URL")
+API_TOKEN = os.environ.get("API_TOKEN")
 
 # Create an object of the class MFRC522
 MIFAREReader = MFRC522()
@@ -57,11 +77,11 @@ print(API_TOKEN)
 RGBLight = RGB(26, 21, 20)
 
 # flash to show ready
-RGBLight.setColor(255, 255, 255)
+RGBLight.setColor(Colors.WHITE.value)
 time.sleep(1)
 RGBLight.turnOff()
 time.sleep(1)
-RGBLight.setColor(255, 255, 255)
+RGBLight.setColor(Colors.WHITE.value)
 time.sleep(1)
 RGBLight.turnOff()
 
@@ -80,11 +100,11 @@ while True:
         time.sleep(1)
 
 # flash to show ready
-RGBLight.setColor(0, 255, 255)
+RGBLight.setColor(Colors.GREEN.value)
 time.sleep(1)
 RGBLight.turnOff()
 time.sleep(1)
-RGBLight.setColor(0, 255, 255)
+RGBLight.setColor(Colors.GREEN.value)
 time.sleep(1)
 RGBLight.turnOff()
 
@@ -102,27 +122,54 @@ try:
             # for each element in uid except the last, convert to hex and add to uid_string
             uid_string = ""
             for element in uid[:-1]:
-                uid_string += format(element, '02x')
+                uid_string += format(element, "02x")
                 # uid_string += " "
 
             print(f"UID: {uid_string}")
 
             # Yellow Light
-            RGBLight.setColor(255, 100, 0)
+            RGBLight.setColor(Colors.YELLOW.value)
 
-            res = requests.post(f"{API_URL}/rest/tap", json={"rfid": uid_string},
-                                headers={"Authorization": f"Bearer {API_TOKEN}"})
+            res = requests.post(
+                f"{API_URL}/rest/tap",
+                json={"rfid": uid_string},
+                headers={"Authorization": f"Bearer {API_TOKEN}"},
+            )
 
-            if res.status_code != 200:
+            if res.status_code == 404:
+                # flash white for two seconds
+                RGBLight.setColor(Colors.WHITE.value)
+                time.sleep(2)
+
+                seq_res = requests.post(
+                    f"{API_URL}/rest/colorRegister",
+                    json={"rfid": uid_string},
+                    headers={"Authorization": f"Bearer {API_TOKEN}"},
+                )
+
+                if seq_res.status_code != 200:
+                    # Red Flash
+                    RGBLight.setColor(Colors.RED.value)
+                    print(f"Error: {res.status_code}")
+
+                seq = seq_res.json().get("sequence")
+
+                for color in seq.split(","):
+                    RGBLight.setColor(Colors[color].value)
+                    time.sleep(1)
+                    RGBLight.turnOff()
+                    time.sleep(0.5)
+
+            elif res.status_code != 200:
                 # Red Flash
-                RGBLight.setColor(255, 0, 0)
+                RGBLight.setColor(Colors.RED.value)
                 print(f"Error: {res.status_code}")
             else:
-                is_tap_in: bool = res.json().get('start')
+                is_tap_in: bool = res.json().get("start")
                 if is_tap_in:
-                    RGBLight.setColor(0, 255, 0)
+                    RGBLight.setColor(Colors.GREEN.value)
                 else:
-                    RGBLight.setColor(0, 0, 255)
+                    RGBLight.setColor(Colors.BLUE.value)
 
             time.sleep(0.2)
             RGBLight.turnOff()

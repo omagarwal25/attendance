@@ -2,14 +2,12 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider             = "mysql"
-  url                  = env("DATABASE_URL")
-  referentialIntegrity = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // Necessary for Next auth
@@ -53,16 +51,17 @@ model User {
 }
 
 model Tag {
-  id     String @id @default(cuid())
-  uuid   String @unique
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  id       String  @id @default(cuid())
+  uuid     String  @unique
+  user     User?   @relation(fields: [userId], references: [id])
+  userId   String?
+  sequence String?
 }
 
 model BuildSession {
   id      String    @id @default(cuid())
   user    User      @relation(fields: [userId], references: [id])
-  startAt DateTime
+  startAt DateTime?
   endAt   DateTime?
   userId  String
   manual  Boolean   @default(false)

@@ -5,9 +5,21 @@ const fs = require("fs");
 
 const prisma = new PrismaClient();
 
+const calculateHoursFromListOfSessions = (sessions) => {
+  const hours = sessions.reduce((acc, session) => {
+    if (!session.endAt) return acc;
+
+    const diff = session.endAt.getTime() - session.startAt.getTime();
+    const hours = diff / 1000 / 60 / 60;
+    return acc + hours;
+  }, 0);
+  return hours;
+};
+
 async function main() {
   // create a file to write to
   const file = fs.createWriteStream("output.csv");
+  const lfile = fs.createWriteStream("sum.csv");
 
   const sessions = await prisma.buildSession.findMany({
     include: {
@@ -39,6 +51,19 @@ async function main() {
     file.write(line);
   }
 
+  const students = await prisma.user.findMany({
+    include: {
+      buildSessions: true,
+    },
+  });
+
+  for (const student of students) {
+    const hours = calculateHoursFromListOfSessions(student.buildSessions);
+    const line = `${student.email},${hours}\n`;
+    lfile.write(line);
+  }
+
+  lfile.end();
   file.end();
 }
 
