@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 // Necessary for Next auth
@@ -24,9 +25,10 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id])
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -35,6 +37,8 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id])
   userId       String
+
+  @@index([userId])
 }
 
 model User {
@@ -56,6 +60,8 @@ model Tag {
   user     User?   @relation(fields: [userId], references: [id])
   userId   String?
   sequence String?
+
+  @@index([userId])
 }
 
 model BuildSession {
@@ -65,6 +71,8 @@ model BuildSession {
   endAt   DateTime?
   userId  String
   manual  Boolean   @default(false)
+
+  @@index([userId])
 }
 
 model VerificationToken {
