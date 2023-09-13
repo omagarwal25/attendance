@@ -54,7 +54,7 @@ export default function UserPage() {
   return (
     <div className="p-2">
       <div className="grid grid-cols-2 gap-2">
-        <p className="flex flex-col col-span-2 items-start">
+        <p className="col-span-2 flex flex-col items-start">
           <h1 className="text-2xl">
             {sessions[0]?.user.email}&apos;s Sessions
           </h1>
@@ -67,12 +67,12 @@ export default function UserPage() {
           </h2>
           {data?.user?.isAdmin && (
             <ConfirmationModal
-              title="Delete All Sessions?"
+              title="Delete User?"
               confirmButtonClass="bg-red-500 text-white"
               cancelButtonLabel="Cancel"
-              confirmButtonLabel="Delete All Sessions"
-              openButtonLabel="Delete All Sessions"
-              description="This will delete all sessions. This is not reversible."
+              confirmButtonLabel="Delete User"
+              openButtonLabel="Delete User"
+              description="This will delete this user. This is not reversible."
               onConfirm={() => deleteUser.mutateAsync(userId as string)}
             />
           )}
@@ -88,7 +88,7 @@ const ColorPicker = ({ submit }: { submit: (color: Color[]) => void }) => {
   const [colors, setColors] = useState<Color[]>(["red", "red", "red"]);
 
   return (
-    <div className="flex flex-row gap-2 items-center p-2">
+    <div className="flex flex-row items-center gap-2 p-2">
       {colors.map((_, i) => (
         <select
           key={i}
@@ -97,7 +97,7 @@ const ColorPicker = ({ submit }: { submit: (color: Color[]) => void }) => {
             newColors[i] = e.target.value as Color;
             setColors(newColors);
           }}
-          className="p-2 rounded"
+          className="rounded p-2"
           value={colors[i]}
         >
           <option value="red">Red</option>
@@ -110,7 +110,7 @@ const ColorPicker = ({ submit }: { submit: (color: Color[]) => void }) => {
       ))}
 
       <button
-        className="p-2 text-white bg-green-700 rounded"
+        className="rounded bg-green-700 p-2 text-white"
         onClick={() => {
           submit(colors);
         }}
