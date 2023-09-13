@@ -1,1 +1,1 @@
-PYTHONPATH=/home/pi/.local/lib/python3.9/site-packages python3 -u /home/pi/attendance/pi/main.py >> /home/pi/logs/attendance.log
+PYTHONPATH=/home/griffins/.local/lib/python3.9/site-packages python3 -u /home/griffins/attendance/pi/main.py >> /home/griffins/logs/attendance.log

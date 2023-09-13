@@ -5,7 +5,7 @@ from enum import Enum
 
 import requests
 import RPi.GPIO as GPIO
-from dotenv import load_dotenv
+from dotenv import main
 from mfrc522 import MFRC522
 
 
@@ -60,7 +60,7 @@ class RGB:
 
 GPIO.setmode(GPIO.BCM)
 
-load_dotenv()
+main.load_dotenv()
 
 API_URL = os.environ.get("API_URL")
 API_TOKEN = os.environ.get("API_TOKEN")
@@ -73,6 +73,8 @@ print("Looking for cards")
 print("Press Ctrl-C to stop.")
 print(API_URL)
 print(API_TOKEN)
+pid = os.getpid()
+print(pid)
 
 RGBLight = RGB(26, 21, 20)
 
@@ -108,13 +110,15 @@ RGBLight.setColor(Colors.GREEN.value)
 time.sleep(1)
 RGBLight.turnOff()
 
+print("ready to go")
+
 try:
     while True:
         # Scan for cards
-        (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
+        (status, TagType) = MIFAREReader.Request(MIFAREReader.PICC_REQIDL)
 
         # Get the UID of the card
-        (status, uid) = MIFAREReader.MFRC522_Anticoll()
+        (status, uid) = MIFAREReader.Anticoll()
 
         # If we have the UID, continue
         if status == MIFAREReader.MI_OK:
@@ -141,6 +145,7 @@ try:
                 RGBLight.setColor(Colors.WHITE.value)
                 time.sleep(2)
                 RGBLight.turnOff()
+                time.sleep(0.5)
 
                 seq_res = requests.post(
                     f"{API_URL}/rest/colorRegister",
@@ -153,10 +158,12 @@ try:
                     RGBLight.setColor(Colors.RED.value)
                     print(f"Error: {res.status_code}")
 
-                seq = seq_res.json().get("sequence")
+                print(seq_res.json(), "RESULT")
+
+                seq = seq_res.json().get("data")
 
                 for color in seq.split(","):
-                    RGBLight.setColor(Colors[color].value)
+                    RGBLight.setColor(Colors[color.upper()].value)
                     time.sleep(1)
                     RGBLight.turnOff()
                     time.sleep(0.5)
