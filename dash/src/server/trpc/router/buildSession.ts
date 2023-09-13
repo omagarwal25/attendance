@@ -74,4 +74,8 @@ export const buildSessionRouter = router({
       });
       return session;
     }),
+
+  purge: adminProcedure.mutation(async ({ ctx }) => {
+    await ctx.prisma.buildSession.deleteMany({});
+  }),
 });

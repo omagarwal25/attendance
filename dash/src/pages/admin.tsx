@@ -1,6 +1,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { BuildSessionTable } from "~components/BuildSessionTable";
+import { ConfirmationModal } from "~components/ConfirmationModal";
 import { LoadingPage } from "~components/LoadingPage";
 import { trpc } from "~utils/trpc";
 
@@ -11,6 +12,7 @@ export default function AdminPage() {
 
   const buildSessions = trpc.buildSession.all.useQuery();
   const leaderboard = trpc.leaderboard.all.useQuery();
+  const deleteAllSessions = trpc.buildSession.purge.useMutation();
 
   if (
     status === "loading" ||
@@ -58,11 +60,19 @@ export default function AdminPage() {
         <p className="flex flex-col items-start">
           <h1 className="text-2xl">Leaderboard</h1>
         </p>
+        <ConfirmationModal
+          title="Delete All Sessions?"
+          confirmButtonClass="bg-red-500 text-white"
+          cancelButtonLabel="Cancel"
+          confirmButtonLabel="Delete All Sessions"
+          openButtonLabel="Delete All Sessions"
+          description="This will delete all sessions. This is not reversible."
+          onConfirm={() => deleteAllSessions.mutateAsync()}
+        />{" "}
         <BuildSessionTable sessions={sessions} />
         {/* <h2 className="p-2">
           Total Hours: {leaderboard.data.hours.toFixed(2)}
         </h2> */}
-
         <div>
           <table className="w-full table-auto">
             <thead className="bg-gray-300">
