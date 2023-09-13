@@ -55,20 +55,21 @@ export default function AdminPage() {
       <div className="grid grid-cols-2 gap-2">
         <p className="flex flex-col items-start">
           <h1 className="text-2xl">All Sessions</h1>
-          Yellow Means Manually Edited
+          Yellow Means
+          <ConfirmationModal
+            title="Delete All Sessions?"
+            confirmButtonClass="bg-red-500 text-white"
+            cancelButtonLabel="Cancel"
+            confirmButtonLabel="Delete All Sessions"
+            openButtonLabel="Delete All Sessions"
+            description="This will delete all sessions. This is not reversible."
+            onConfirm={() => deleteAllSessions.mutateAsync()}
+          />
+          Manually Edited
         </p>
         <p className="flex flex-col items-start">
           <h1 className="text-2xl">Leaderboard</h1>
         </p>
-        <ConfirmationModal
-          title="Delete All Sessions?"
-          confirmButtonClass="bg-red-500 text-white"
-          cancelButtonLabel="Cancel"
-          confirmButtonLabel="Delete All Sessions"
-          openButtonLabel="Delete All Sessions"
-          description="This will delete all sessions. This is not reversible."
-          onConfirm={() => deleteAllSessions.mutateAsync()}
-        />{" "}
         <BuildSessionTable sessions={sessions} />
         {/* <h2 className="p-2">
           Total Hours: {leaderboard.data.hours.toFixed(2)}
