@@ -30,7 +30,7 @@ export const ConfirmationModal: FC<Props> = ({
     <>
       <div className="flex h-60 items-center justify-center">
         <button
-          className="rounded-md bg-purple-600 py-3 px-6 text-purple-100"
+          className={`rounded-md py-3 px-6 ${confirmButtonClass}`}
           type="button"
           onClick={() => setShowModal(true)}
         >
