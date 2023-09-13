@@ -140,6 +140,7 @@ try:
                 # flash white for two seconds
                 RGBLight.setColor(Colors.WHITE.value)
                 time.sleep(2)
+                RGBLight.turnOff()
 
                 seq_res = requests.post(
                     f"{API_URL}/rest/colorRegister",

@@ -63,7 +63,7 @@ export default async function userHandler(
     });
 
     if (!tagWithSequence) {
-      if (tag)
+      if (tag) {
         await prisma.tag.update({
           where: {
             uuid: rfid,
@@ -72,13 +72,14 @@ export default async function userHandler(
             sequence: seuqence,
           },
         });
-      else
+      } else {
         await prisma.tag.create({
           data: {
             uuid: rfid,
             sequence: seuqence,
           },
         });
+      }
       return res.status(200).json({ data: seuqence, message: "Successful" });
     }
   }
