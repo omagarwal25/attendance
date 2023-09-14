@@ -4,6 +4,8 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ChangeEvent, FC, useState } from "react";
+import CsvDownload from "react-csv-downloader";
+import { getSessionsCSV, sessionsColumns } from "~utils/csv";
 import { trpc } from "~utils/trpc";
 
 type Row = BuildSession & { user: User };
@@ -22,6 +24,15 @@ export const BuildSessionTable: FC<{
 
   return (
     <div className="flex flex-col gap-2">
+      <CsvDownload
+        columns={sessionsColumns}
+        datas={() => getSessionsCSV(sessions)}
+        filename={`sessions-${new Date().toISOString()}.csv`}
+      >
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Download CSV
+        </button>
+      </CsvDownload>
       <table className="w-full table-auto">
         <thead className="bg-gray-200">
           <tr>
@@ -57,7 +68,7 @@ export const BuildSessionTable: FC<{
         </tbody>
       </table>
       {showAddForm && <CreateRow onClose={() => setShowAddForm(false)} />}
-    </div>
+    </div >
   );
 };
 

@@ -1167,6 +1167,11 @@ file-entry-cache@^6.0.1:
   dependencies:
     flat-cache "^3.0.4"
 
+file-saver@^2.0.2:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-2.0.5.tgz#d61cfe2ce059f414d899e9dd6d4107ee25670c38"
+  integrity sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==
+
 fill-range@^7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/fill-range/-/fill-range-7.0.1.tgz#1919a6a7c75fe38b2c7c77e5198535da9acdda40"
@@ -2112,6 +2117,13 @@ quick-lru@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-5.1.1.tgz#366493e6b3e42a3a6885e2e99d18f80fb7a8c932"
   integrity sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==
+
+react-csv-downloader@^2.9.1:
+  version "2.9.1"
+  resolved "https://registry.yarnpkg.com/react-csv-downloader/-/react-csv-downloader-2.9.1.tgz#ccee0b6b5bb5f960f7e70788413a17b97a42ba1e"
+  integrity sha512-bjd+tRkzsoOkaxeFFf2PMevim9LZRi70KzNXbVKyljzr0/V+grFa6zJNWEZFdPI57JWKpE6ZZek1vaLxQjTttg==
+  dependencies:
+    file-saver "^2.0.2"
 
 react-dom@18.2.0:
   version "18.2.0"

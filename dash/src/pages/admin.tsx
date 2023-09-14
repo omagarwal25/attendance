@@ -1,8 +1,10 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import CsvDownload from "react-csv-downloader";
 import { BuildSessionTable } from "~components/BuildSessionTable";
 import { ConfirmationModal } from "~components/ConfirmationModal";
 import { LoadingPage } from "~components/LoadingPage";
+import { getLeaderboardCSV, leaderboardColumns } from "~utils/csv";
 import { trpc } from "~utils/trpc";
 
 export default function AdminPage() {
@@ -52,7 +54,7 @@ export default function AdminPage() {
     <div className="p-2">
       <h1 className="text-3xl">Admin</h1>
       {/* <Downloads /> */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         <p className="flex flex-col items-start">
           <h1 className="text-2xl">All Sessions</h1>
           Yellow Means
@@ -74,7 +76,16 @@ export default function AdminPage() {
         {/* <h2 className="p-2">
           Total Hours: {leaderboard.data.hours.toFixed(2)}
         </h2> */}
-        <div>
+        <div className="flex flex-col gap-2"> <CsvDownload
+          columns={leaderboardColumns}
+          datas={() => getLeaderboardCSV(leaderboardSorted)}
+          filename={`leaderboard-${new Date().toISOString()}.csv`}
+        >
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Download CSV
+          </button>
+        </CsvDownload>
+
           <table className="w-full table-auto">
             <thead className="bg-gray-300">
               <tr>
