@@ -28,7 +28,7 @@ export const ConfirmationModal: FC<Props> = ({
   };
   return (
     <>
-      <div className="flex h-60 items-center justify-center">
+      <div className="flex items-center">
         <button
           className={`rounded-md p-3 ${confirmButtonClass}`}
           type="button"
