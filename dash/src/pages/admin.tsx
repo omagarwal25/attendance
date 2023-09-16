@@ -60,7 +60,7 @@ export default function AdminPage() {
       <h1 className="text-3xl">Admin</h1>
       {/* <Downloads /> */}
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-        <p className="flex flex-col gap-2">
+        <p className="flex flex-col gap-2 self-start">
           <h1 className="text-2xl">All Sessions</h1>
           <p className="flex gap-2 items-center">
             <ConfirmationModal
@@ -84,7 +84,7 @@ export default function AdminPage() {
           </p>
           <BuildSessionTable sessions={sessions} />
         </p>
-        <p className="flex flex-col items-start">
+        <p className="flex flex-col items-start self-start">
           <h1 className="text-2xl">Leaderboard</h1>
           <div className="flex flex-col gap-2">
             <CsvDownload
