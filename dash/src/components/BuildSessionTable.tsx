@@ -24,16 +24,7 @@ export const BuildSessionTable: FC<{
 
   return (
     <div className="flex flex-col gap-2">
-      <p>Yellow Means Mannually Edited</p>
-      <CsvDownload
-        columns={sessionsColumns}
-        datas={() => getSessionsCSV(sessions)}
-        filename={`sessions-${new Date().toISOString()}.csv`}
-      >
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Download CSV
-        </button>
-      </CsvDownload>
+
       <table className="w-full table-auto">
         <thead className="bg-gray-200">
           <tr>

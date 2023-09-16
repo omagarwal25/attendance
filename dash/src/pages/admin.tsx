@@ -4,7 +4,12 @@ import CsvDownload from "react-csv-downloader";
 import { BuildSessionTable } from "~components/BuildSessionTable";
 import { ConfirmationModal } from "~components/ConfirmationModal";
 import { LoadingPage } from "~components/LoadingPage";
-import { getLeaderboardCSV, leaderboardColumns } from "~utils/csv";
+import {
+  getLeaderboardCSV,
+  getSessionsCSV,
+  leaderboardColumns,
+  sessionsColumns,
+} from "~utils/csv";
 import { trpc } from "~utils/trpc";
 
 export default function AdminPage() {
@@ -57,15 +62,26 @@ export default function AdminPage() {
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         <p className="flex flex-col gap-2">
           <h1 className="text-2xl">All Sessions</h1>
-          <ConfirmationModal
-            title="Delete All Sessions?"
-            confirmButtonClass="bg-red-500 text-white"
-            cancelButtonLabel="Cancel"
-            confirmButtonLabel="Delete All Sessions"
-            openButtonLabel="Delete All Sessions"
-            description="This will delete all sessions. This is not reversible."
-            onConfirm={() => deleteAllSessions.mutateAsync()}
-          />
+          <p className="flex gap-2">
+            <ConfirmationModal
+              title="Delete All Sessions?"
+              confirmButtonClass="bg-red-500 text-white"
+              cancelButtonLabel="Cancel"
+              confirmButtonLabel="Delete All Sessions"
+              openButtonLabel="Delete All Sessions"
+              description="This will delete all sessions. This is not reversible."
+              onConfirm={() => deleteAllSessions.mutateAsync()}
+            />
+            <CsvDownload
+              columns={sessionsColumns}
+              datas={() => getSessionsCSV(sessions)}
+              filename={`sessions-${new Date().toISOString()}.csv`}
+            >
+              <button className="rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-700">
+                Download CSV
+              </button>
+            </CsvDownload>
+          </p>
           <BuildSessionTable sessions={sessions} />
         </p>
         <p className="flex flex-col items-start">
