@@ -77,7 +77,7 @@ export default function AdminPage() {
               datas={() => getSessionsCSV(sessions)}
               filename={`sessions-${new Date().toISOString()}.csv`}
             >
-              <button className="rounded bg-blue-500 p-5 text-white hover:bg-blue-700">
+              <button className="rounded bg-blue-500 p-3 text-white hover:bg-blue-700">
                 Download CSV
               </button>
             </CsvDownload>
@@ -92,7 +92,7 @@ export default function AdminPage() {
               datas={() => getLeaderboardCSV(leaderboardSorted)}
               filename={`leaderboard-${new Date().toISOString()}.csv`}
             >
-              <button className="rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700">
+              <button className="rounded bg-blue-500 p-3 font-bold text-white hover:bg-blue-700">
                 Download CSV
               </button>
             </CsvDownload>
