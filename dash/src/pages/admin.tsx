@@ -55,7 +55,7 @@ export default function AdminPage() {
       <h1 className="text-3xl">Admin</h1>
       {/* <Downloads /> */}
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-        <p className="flex flex-col items-start">
+        <p className="flex flex-col gap-2">
           <h1 className="text-2xl">All Sessions</h1>
           <ConfirmationModal
             title="Delete All Sessions?"
