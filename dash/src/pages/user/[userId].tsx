@@ -53,15 +53,15 @@ export default function UserPage() {
 
   return (
     <div className="p-2">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-        <p className="md:col-span-2 flex flex-col items-start">
+      <div className="grid grid-cols-2 gap-2">
+        <p className="flex flex-col items-start">
           <h1 className="text-2xl">
             {sessions[0]?.user.email}&apos;s Sessions
           </h1>
           Yellow Means Manually Edited
+          <BuildSessionTable sessions={sessions} />
         </p>
-        <BuildSessionTable sessions={sessions} />
-        <div>
+        <div className="flex flex-col gap-2">
           <h2 className="p-2">
             Total Hours: {leaderboard.data.hours.toFixed(2)}
           </h2>

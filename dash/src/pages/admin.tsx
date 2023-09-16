@@ -54,10 +54,9 @@ export default function AdminPage() {
     <div className="p-2">
       <h1 className="text-3xl">Admin</h1>
       {/* <Downloads /> */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         <p className="flex flex-col items-start">
           <h1 className="text-2xl">All Sessions</h1>
-          Yellow Means
           <ConfirmationModal
             title="Delete All Sessions?"
             confirmButtonClass="bg-red-500 text-white"
@@ -67,46 +66,46 @@ export default function AdminPage() {
             description="This will delete all sessions. This is not reversible."
             onConfirm={() => deleteAllSessions.mutateAsync()}
           />
-          Manually Edited
+          <BuildSessionTable sessions={sessions} />
         </p>
         <p className="flex flex-col items-start">
           <h1 className="text-2xl">Leaderboard</h1>
-        </p>
-        <BuildSessionTable sessions={sessions} />
-        {/* <h2 className="p-2">
-          Total Hours: {leaderboard.data.hours.toFixed(2)}
-        </h2> */}
-        <div className="flex flex-col gap-2"> <CsvDownload
-          columns={leaderboardColumns}
-          datas={() => getLeaderboardCSV(leaderboardSorted)}
-          filename={`leaderboard-${new Date().toISOString()}.csv`}
-        >
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Download CSV
-          </button>
-        </CsvDownload>
+          <div className="flex flex-col gap-2">
+            <CsvDownload
+              columns={leaderboardColumns}
+              datas={() => getLeaderboardCSV(leaderboardSorted)}
+              filename={`leaderboard-${new Date().toISOString()}.csv`}
+            >
+              <button className="rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700">
+                Download CSV
+              </button>
+            </CsvDownload>
 
-          <table className="w-full table-auto">
-            <thead className="bg-gray-300">
-              <tr>
-                <th>Rank</th>
-                <th>Username</th>
-                <th>Hours</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leaderboardSorted.map((user) => (
-                <tr key={user.id} className="odd:bg-gray-200 even:bg-gray-100">
-                  <td>{leaderboardSorted.indexOf(user) + 1}</td>
-                  <td className="underline">
-                    <Link href={`/user/${user.id}`}>{user.email}</Link>
-                  </td>
-                  <td>{user.hours.toFixed(2)}</td>
+            <table className="w-full table-auto">
+              <thead className="bg-gray-300">
+                <tr>
+                  <th>Rank</th>
+                  <th>Username</th>
+                  <th>Hours</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {leaderboardSorted.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="odd:bg-gray-200 even:bg-gray-100"
+                  >
+                    <td>{leaderboardSorted.indexOf(user) + 1}</td>
+                    <td className="underline">
+                      <Link href={`/user/${user.id}`}>{user.email}</Link>
+                    </td>
+                    <td>{user.hours.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </p>
       </div>
     </div>
   );

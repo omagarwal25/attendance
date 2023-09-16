@@ -24,6 +24,7 @@ export const BuildSessionTable: FC<{
 
   return (
     <div className="flex flex-col gap-2">
+      <p>Yellow Means Mannually Edited</p>
       <CsvDownload
         columns={sessionsColumns}
         datas={() => getSessionsCSV(sessions)}
