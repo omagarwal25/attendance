@@ -17,6 +17,10 @@ export const userRouter = router({
     return ctx.prisma.user.findMany();
   }),
 
+  allEmails: adminProcedure.query(({ ctx }) => {
+    return ctx.prisma.user.findMany({ select: { id: true, email: true } });
+  }),
+
   delete: adminProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
     await ctx.prisma.buildSession.deleteMany({ where: { userId: input } });
     await ctx.prisma.tag.deleteMany({ where: { userId: input } });

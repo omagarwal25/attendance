@@ -33,7 +33,7 @@ const EmailPicker: FC<{
   value: string;
   onChange: (value: string) => void;
 }> = ({ value, onChange }) => {
-  const { data: users } = trpc.user.all.useQuery();
+  const { data: users } = trpc.user.allEmails.useQuery();
 
   // useEffect(() => {
   // onChange(users?.[0]?.email ?? "");
