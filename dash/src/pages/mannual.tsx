@@ -1,10 +1,17 @@
 import { FC, useState } from "react";
+import { LoadingPage } from "~components/LoadingPage";
 
 import { trpc } from "~utils/trpc";
 
 export default function AdminPage() {
-  const { mutateAsync } = trpc.buildSession.digitalTap.useMutation();
+  const { mutateAsync, status } = trpc.buildSession.digitalTap.useMutation();
   const [userId, setUserId] = useState("");
+
+  if (
+    status === "loading"
+  ) {
+    return <LoadingPage />;
+  }
 
   return (
     <div className="p-2">
@@ -24,7 +31,12 @@ export default function AdminPage() {
         </p>
       </div>
 
-      <button className="p-2 bg-green-500 rounded-md" onClick={() => mutateAsync(userId)}>Tap</button>
+      <button
+        className="rounded-md bg-green-500 p-2"
+        onClick={() => mutateAsync(userId)}
+      >
+        Tap
+      </button>
     </div>
   );
 }
