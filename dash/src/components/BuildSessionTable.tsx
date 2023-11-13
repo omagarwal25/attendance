@@ -9,10 +9,12 @@ import { getSessionsCSV, sessionsColumns } from "~utils/csv";
 import { trpc } from "~utils/trpc";
 
 type Row = BuildSession & { user: User };
+type Props = {
+  sessions: Row[];
+  showDelButton: boolean;
+}
 
-export const BuildSessionTable: FC<{
-  sessions: (BuildSession & { user: User })[];
-}> = ({ sessions }) => {
+export const BuildSessionTable: FC<Props> = ({ sessions, showDelButton = true }) => {
   const { data } = useSession();
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -24,7 +26,6 @@ export const BuildSessionTable: FC<{
 
   return (
     <div className="flex flex-col gap-2">
-
       <table className="w-full table-auto">
         <thead className="bg-gray-200">
           <tr>
@@ -42,6 +43,7 @@ export const BuildSessionTable: FC<{
               showUserColumn={showUserColumn}
               session={session}
               isAdmin={isAdmin}
+              showDelButton={showDelButton}
             />
           ))}
           {isAdmin && !showAddForm && (
@@ -60,7 +62,7 @@ export const BuildSessionTable: FC<{
         </tbody>
       </table>
       {showAddForm && <CreateRow onClose={() => setShowAddForm(false)} />}
-    </div >
+    </div>
   );
 };
 
@@ -315,7 +317,8 @@ const TableRow: FC<{
   session: Row;
   isAdmin: boolean;
   showUserColumn: boolean;
-}> = ({ session, isAdmin, showUserColumn }) => {
+  showDelButton?: boolean;
+}> = ({ session, isAdmin, showUserColumn, showDelButton = true }) => {
   const [editMode, setEditMode] = useState(false);
 
   const deleteSession = trpc.buildSession.delete.useMutation();
@@ -366,7 +369,7 @@ const TableRow: FC<{
               )}
             </span>
           )}
-          {isAdmin && (
+          {isAdmin && showDelButton && (
             <>
               <span className="flex items-center">
                 <Icon
