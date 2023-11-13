@@ -11,7 +11,7 @@ import { trpc } from "~utils/trpc";
 type Row = BuildSession & { user: User };
 type Props = {
   sessions: Row[];
-  showDelButton: boolean;
+  showDelButton?: boolean;
 }
 
 export const BuildSessionTable: FC<Props> = ({ sessions, showDelButton = true }) => {
