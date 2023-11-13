@@ -4,19 +4,15 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ChangeEvent, FC, useState } from "react";
-import CsvDownload from "react-csv-downloader";
-import { getSessionsCSV, sessionsColumns } from "~utils/csv";
 import { trpc } from "~utils/trpc";
 
 type Row = BuildSession & { user: User };
 type Props = {
   sessions: Row[];
-  showDelButton?: boolean;
 };
 
 export const BuildSessionTable: FC<Props> = ({
   sessions,
-  showDelButton = true,
 }) => {
   const { data } = useSession();
   const [showAddForm, setShowAddForm] = useState(false);
@@ -46,7 +42,6 @@ export const BuildSessionTable: FC<Props> = ({
               showUserColumn={showUserColumn}
               session={session}
               isAdmin={isAdmin}
-              showDelButton={showDelButton}
             />
           ))}
           {isAdmin && !showAddForm && (
@@ -320,8 +315,7 @@ const TableRow: FC<{
   session: Row;
   isAdmin: boolean;
   showUserColumn: boolean;
-  showDelButton?: boolean;
-}> = ({ session, isAdmin, showUserColumn, showDelButton = true }) => {
+}> = ({ session, isAdmin, showUserColumn }) => {
   const [editMode, setEditMode] = useState(false);
 
   const deleteSession = trpc.buildSession.delete.useMutation();
@@ -381,16 +375,14 @@ const TableRow: FC<{
                   onClick={() => setEditMode(true)}
                 />
 
-                {showDelButton &&
-                  <Icon
-                    icon="heroicons:trash-solid"
-                    className="cursor-pointer text-2xl"
-                    onClick={async () => {
-                      await deleteSession.mutateAsync(session.id);
-                      router.reload();
-                    }}
-                  />
-                }
+                <Icon
+                  icon="heroicons:trash-solid"
+                  className="cursor-pointer text-2xl"
+                  onClick={async () => {
+                    await deleteSession.mutateAsync(session.id);
+                    router.reload();
+                  }}
+                />
               </span>
             </>
           )}
