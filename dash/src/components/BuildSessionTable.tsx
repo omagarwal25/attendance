@@ -12,9 +12,12 @@ type Row = BuildSession & { user: User };
 type Props = {
   sessions: Row[];
   showDelButton?: boolean;
-}
+};
 
-export const BuildSessionTable: FC<Props> = ({ sessions, showDelButton = true }) => {
+export const BuildSessionTable: FC<Props> = ({
+  sessions,
+  showDelButton = true,
+}) => {
   const { data } = useSession();
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -49,11 +52,11 @@ export const BuildSessionTable: FC<Props> = ({ sessions, showDelButton = true })
           {isAdmin && !showAddForm && (
             <tr>
               <td colSpan={showUserColumn ? 5 : 4}>
-                <div className="flex justify-center items-center">
+                <div className="flex items-center justify-center">
                   <Icon
                     icon="heroicons:plus-circle-solid"
                     onClick={() => setShowAddForm(true)}
-                    className="text-2xl cursor-pointer"
+                    className="cursor-pointer text-2xl"
                   />
                 </div>
               </td>
@@ -198,12 +201,12 @@ const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
         />
       </span>
 
-      <span className="flex gap-2 items-center">
+      <span className="flex items-center gap-2">
         {/** Because the built in time inputs are bad, let's use a set of 24 hour numeric */}
         Start Time:
         <input
           type="number"
-          className="w-20 h-10 rounded-md"
+          className="h-10 w-20 rounded-md"
           min={0}
           max={23}
           value={buildSession.start.hours}
@@ -220,7 +223,7 @@ const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
         :
         <input
           type="number"
-          className="w-20 h-10 rounded-md"
+          className="h-10 w-20 rounded-md"
           min={0}
           max={59}
           value={buildSession.start.minutes}
@@ -236,7 +239,7 @@ const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
         />
       </span>
 
-      <span className="flex gap-2 items-center">
+      <span className="flex items-center gap-2">
         <label htmlFor="end">Set End Time?</label>
         <input
           type="checkbox"
@@ -248,12 +251,12 @@ const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
       </span>
 
       {buildSession.end && (
-        <span className="flex gap-2 items-center">
+        <span className="flex items-center gap-2">
           End Time:{" "}
           <>
             <input
               type="number"
-              className="w-20 h-10 rounded-md"
+              className="h-10 w-20 rounded-md"
               min={0}
               max={23}
               value={buildSession.end.hours ?? 0}
@@ -272,7 +275,7 @@ const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
             :
             <input
               type="number"
-              className="w-20 h-10 rounded-md"
+              className="h-10 w-20 rounded-md"
               min={0}
               max={59}
               value={buildSession.end.minutes}
@@ -294,14 +297,14 @@ const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
 
       <span className="flex gap-2">
         <button
-          className="flex gap-1 items-center p-2 text-white bg-red-800 rounded-md"
+          className="flex items-center gap-1 rounded-md bg-red-800 p-2 text-white"
           onClick={onClose}
         >
           Cancel
           <Icon icon="heroicons:x-circle-solid" className="text-2xl" />
         </button>
         <button
-          className="flex gap-1 items-center p-2 text-white bg-green-800 rounded-md disabled:cursor-not-allowed"
+          className="flex items-center gap-1 rounded-md bg-green-800 p-2 text-white disabled:cursor-not-allowed"
           disabled={buildSession.userId === ""}
           onClick={onSubmit}
         >
@@ -355,7 +358,7 @@ const TableRow: FC<{
                 hour: "2-digit",
               })
             ) : (
-              <span className="flex gap-1 items-center text-red-500">None</span>
+              <span className="flex items-center gap-1 text-red-500">None</span>
             )}
           </td>
           {!isAdmin && (
@@ -363,29 +366,31 @@ const TableRow: FC<{
               {!isAdmin && !session.endAt && (
                 <Icon
                   icon="heroicons:pencil-square-20-solid"
-                  className="text-2xl text-red-500 cursor-pointer"
+                  className="cursor-pointer text-2xl text-red-500"
                   onClick={() => setEditMode(true)}
                 />
               )}
             </span>
           )}
-          {isAdmin && showDelButton && (
+          {isAdmin && (
             <>
               <span className="flex items-center">
                 <Icon
                   icon="heroicons:pencil-square-solid"
-                  className="text-2xl cursor-pointer"
+                  className="cursor-pointer text-2xl"
                   onClick={() => setEditMode(true)}
                 />
 
-                <Icon
-                  icon="heroicons:trash-solid"
-                  className="text-2xl cursor-pointer"
-                  onClick={async () => {
-                    await deleteSession.mutateAsync(session.id);
-                    router.reload();
-                  }}
-                />
+                {showDelButton &&
+                  <Icon
+                    icon="heroicons:trash-solid"
+                    className="cursor-pointer text-2xl"
+                    onClick={async () => {
+                      await deleteSession.mutateAsync(session.id);
+                      router.reload();
+                    }}
+                  />
+                }
               </span>
             </>
           )}
@@ -447,11 +452,11 @@ const EditRow: FC<{ session: Row; onCloseEdit: () => void }> = ({
   return (
     <>
       <td>
-        <span className="flex gap-2 items-center">
+        <span className="flex items-center gap-2">
           {/** Because the built in time inputs are bad, let's use a set of 24 hour numeric */}
           <input
             type="number"
-            className="w-20 h-10 rounded-md"
+            className="h-10 w-20 rounded-md"
             min={0}
             max={23}
             value={startAt.hours}
@@ -465,7 +470,7 @@ const EditRow: FC<{ session: Row; onCloseEdit: () => void }> = ({
           :
           <input
             type="number"
-            className="w-20 h-10 rounded-md"
+            className="h-10 w-20 rounded-md"
             min={0}
             max={59}
             value={startAt.minutes}
@@ -479,10 +484,10 @@ const EditRow: FC<{ session: Row; onCloseEdit: () => void }> = ({
         </span>
       </td>
       <td>
-        <span className="flex gap-2 items-center">
+        <span className="flex items-center gap-2">
           <input
             type="number"
-            className="w-20 h-10 rounded-md"
+            className="h-10 w-20 rounded-md"
             min={0}
             max={23}
             value={endAt.hours}
@@ -496,7 +501,7 @@ const EditRow: FC<{ session: Row; onCloseEdit: () => void }> = ({
           :
           <input
             type="number"
-            className="w-20 h-10 rounded-md"
+            className="h-10 w-20 rounded-md"
             min={0}
             max={59}
             value={endAt.minutes}
@@ -513,12 +518,12 @@ const EditRow: FC<{ session: Row; onCloseEdit: () => void }> = ({
         <span className="flex items-center">
           <Icon
             icon="heroicons:x-circle-solid"
-            className="text-2xl text-red-800 cursor-pointer"
+            className="cursor-pointer text-2xl text-red-800"
             onClick={onCloseEdit}
           />
           <Icon
             icon="heroicons:check-circle-solid"
-            className="text-2xl text-green-800 cursor-pointer"
+            className="cursor-pointer text-2xl text-green-800"
             onClick={onSubmit}
           />
         </span>

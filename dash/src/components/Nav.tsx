@@ -39,6 +39,7 @@ export const Nav = () => {
           </button>
         )}
         {isAdmin && <Link href="/admin">Admin</Link>}
+        {isAdmin && <Link href="/mannual">Mannual</Link>}
       </div>
     </nav>
   );
