@@ -63,7 +63,7 @@ const EmailPicker: FC<{
         Select User
       </option>
       {users.map((user) => (
-        <option key={user.id} value={user.id}>
+        <option key={user.id} value={user.email}>
           {user.email}
         </option>
       ))}
