@@ -17,7 +17,7 @@ export const userRouter = router({
     return ctx.prisma.user.findMany();
   }),
 
-  allEmails: adminProcedure.query(({ ctx }) => {
+  allEmails: protectedProcedure.query(({ ctx }) => {
     return ctx.prisma.user.findMany({ select: { id: true, email: true } });
   }),
 
