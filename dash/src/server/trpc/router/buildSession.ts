@@ -63,7 +63,6 @@ export const buildSessionRouter = router({
 
     const session = await ctx.prisma.buildSession.findFirst({
       where: {
-        manual: true,
         user: {
           email: input,
         },
@@ -81,6 +80,7 @@ export const buildSessionRouter = router({
       await ctx.prisma.buildSession.create({
         data: {
           startAt: new Date(),
+          manual: true,
           user: {
             connect: {
               email: input,
