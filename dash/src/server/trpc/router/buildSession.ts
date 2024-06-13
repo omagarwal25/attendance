@@ -20,7 +20,7 @@ export const buildSessionRouter = router({
     }
   }),
 
-  edit: protectedProcedure
+  edit: adminProcedure
     .input(
       z.object({
         id: z.string(),
@@ -38,12 +38,6 @@ export const buildSessionRouter = router({
 
       if (!session) throw new TRPCError({ code: "NOT_FOUND" });
 
-      if (
-        !env.ADMIN_EMAIL.includes(ctx.session.user.email) &&
-        ctx.session.user.id !== session.userId
-      )
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-
       const updatedSession = await ctx.prisma.buildSession.update({
         where: { id },
         data: { ...data, manual: true },
@@ -59,53 +53,52 @@ export const buildSessionRouter = router({
     return session;
   }),
 
-  digitalTap: protectedProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
-
-    const session = await ctx.prisma.buildSession.findFirst({
-      where: {
-        user: {
-          email: input,
-        },
-        startAt: {
-          // the start is today
-          gte: new Date(new Date().setHours(0, 0, 0, 0)),
-        },
-        // the end is null
-        endAt: null,
-      },
-    });
-
-    // if the session is null, then we need to create a new session
-    if (!session) {
-      await ctx.prisma.buildSession.create({
-        data: {
-          startAt: new Date(),
-          manual: true,
-          user: {
-            connect: {
-              email: input,
-            }
-          }
-        },
-      });
-
-      return
-    } else {
-      // otherwise we need to end the session
-      await ctx.prisma.buildSession.update({
+  digitalTap: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const session = await ctx.prisma.buildSession.findFirst({
         where: {
-          id: session.id,
-        },
-        data: {
-          endAt: new Date(),
+          user: {
+            email: input,
+          },
+          startAt: {
+            // the start is today
+            gte: new Date(new Date().setHours(0, 0, 0, 0)),
+          },
+          // the end is null
+          endAt: null,
         },
       });
 
-      return
-    }
+      // if the session is null, then we need to create a new session
+      if (!session) {
+        await ctx.prisma.buildSession.create({
+          data: {
+            startAt: new Date(),
+            manual: true,
+            user: {
+              connect: {
+                email: input,
+              },
+            },
+          },
+        });
 
-  }),
+        return;
+      } else {
+        // otherwise we need to end the session
+        await ctx.prisma.buildSession.update({
+          where: {
+            id: session.id,
+          },
+          data: {
+            endAt: new Date(),
+          },
+        });
 
+        return;
+      }
+    }),
 
   create: adminProcedure
     .input(buildSessionSchema.omit({ id: true, manual: true }))

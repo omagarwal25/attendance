@@ -17,6 +17,7 @@ export const serverSchema = z.object({
     process.env.VERCEL ? z.string() : z.string().url()
   ),
   ADMIN_EMAIL: z.string(),
+  APPROVER_EMAIL: z.string().email(),
   // DISCORD_CLIENT_ID: z.string(),
   // DISCORD_CLIENT_SECRET: z.string(),
   // GOOGLE_CLIENT_ID: z.string(),
