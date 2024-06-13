@@ -62,7 +62,7 @@ export default function AdminPage() {
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         <p className="flex flex-col gap-2 self-start">
           <h1 className="text-2xl">All Sessions</h1>
-          <p className="flex gap-2 items-center">
+          <p className="flex items-center gap-2">
             <ConfirmationModal
               title="Delete All Sessions?"
               confirmButtonClass="bg-red-500 text-white"

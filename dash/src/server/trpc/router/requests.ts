@@ -5,7 +5,7 @@ import { requestSchema } from "~models/request";
 import { createTransport, hoursRequestEmail } from "~utils/email";
 import { adminProcedure, protectedProcedure, router } from "../trpc";
 
-export const buildSessionRouter = router({
+export const requestsRouter = router({
   all: adminProcedure.query(({ ctx }) => {
     return ctx.prisma.request.findMany({
       include: { user: true, session: true },

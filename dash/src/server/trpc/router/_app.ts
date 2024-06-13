@@ -3,12 +3,14 @@ import { router } from "../trpc";
 
 import { buildSessionRouter } from "./buildSession";
 import { leaderboardRouter } from "./leaderboard";
+import { requestsRouter } from "./requests";
 import { userRouter } from "./user";
 
 export const appRouter = router({
-  leaderboard: leaderboardRouter,
   buildSession: buildSessionRouter,
   user: userRouter,
+  requests: requestsRouter,
+  leaderboard: leaderboardRouter,
 });
 
 // export type definition of API
