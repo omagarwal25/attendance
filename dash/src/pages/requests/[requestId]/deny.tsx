@@ -4,13 +4,12 @@ import { LoadingPage } from "~components/LoadingPage";
 import { trpc } from "~utils/trpc";
 
 export default function AcceptRequest() {
+  const trpcUtils = trpc.useUtils();
   const { data, status } = useSession();
   const { mutateAsync } = trpc.requests.deny.useMutation();
   const router = useRouter();
 
   const params = router.query as { requestId: string };
-
-  // TODO flash something to indicate the status of the user's RFIDs
 
   if (status === "loading") {
     return <LoadingPage />;
@@ -24,6 +23,10 @@ export default function AcceptRequest() {
 
   const handleDeny = async () => {
     await mutateAsync(params.requestId);
+
+    await trpcUtils.requests.invalidate();
+    await trpcUtils.buildSession.invalidate();
+    await trpcUtils.leaderboard.invalidate();
 
     router.push("/admin");
   };

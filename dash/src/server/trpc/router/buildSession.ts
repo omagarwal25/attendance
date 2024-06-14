@@ -1,19 +1,28 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { env } from "~env/server.mjs";
 import { buildSessionSchema } from "~models/buildSession";
 import { adminProcedure, protectedProcedure, router } from "../trpc";
 
 export const buildSessionRouter = router({
   all: adminProcedure.query(({ ctx }) => {
-    return ctx.prisma.buildSession.findMany({ include: { user: true } });
+    return ctx.prisma.buildSession.findMany({
+      include:
+      {
+        user: true,
+        _count: {
+          select: {
+            requests: { where: { status: "PENDING" } }
+          }
+        }
+      }
+    });
   }),
 
   byUser: protectedProcedure.input(z.string()).query(({ ctx, input }) => {
     if (ctx.session.user.isAdmin || ctx.session.user.id === input) {
       return ctx.prisma.buildSession.findMany({
         where: { userId: input },
-        include: { user: true },
+        include: { user: true, _count: { select: { requests: { where: { status: "PENDING" } } } } },
       });
     } else {
       throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -25,7 +34,7 @@ export const buildSessionRouter = router({
       z.object({
         id: z.string(),
         data: buildSessionSchema.omit({ id: true, manual: true }).partial(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const { id, data } = input;

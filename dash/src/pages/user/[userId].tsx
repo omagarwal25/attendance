@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BuildSessionTable } from "~components/BuildSessionTable";
 import { ConfirmationModal } from "~components/ConfirmationModal";
 import { LoadingPage } from "~components/LoadingPage";
+import { RequestsTable } from "~components/RequestsTable";
 import { Color } from "~utils/color";
 import { trpc } from "~utils/trpc";
 
@@ -16,12 +17,14 @@ export default function UserPage() {
   const leaderboard = trpc.leaderboard.byUser.useQuery(userId as string);
   const registerTag = trpc.user.registerTag.useMutation();
   const deleteUser = trpc.user.delete.useMutation();
+  const requests = trpc.requests.pendingByUser.useQuery(userId as string);
 
   if (
     status === "loading" ||
     buildSessions.status === "loading" ||
     leaderboard.status === "loading" ||
-    registerTag.status === "loading"
+    registerTag.status === "loading" ||
+    requests.status === "loading"
   ) {
     return <LoadingPage />;
   }
@@ -29,12 +32,14 @@ export default function UserPage() {
   if (
     (buildSessions.isError && buildSessions.error) ||
     (leaderboard.isError && leaderboard.error) ||
-    (registerTag.isError && registerTag.error)
+    (registerTag.isError && registerTag.error) ||
+    (requests.isError && requests.error)
   ) {
     if (
       buildSessions.error?.data?.code === "UNAUTHORIZED" ||
       leaderboard.error?.data?.code === "UNAUTHORIZED" ||
-      registerTag.error?.data?.code === "UNAUTHORIZED"
+      registerTag.error?.data?.code === "UNAUTHORIZED" ||
+      requests.error?.data?.code === "UNAUTHORIZED"
     ) {
       return <div>Unauthorized</div>;
     } else return <div>Error</div>;
@@ -43,6 +48,7 @@ export default function UserPage() {
   if (!data) return <LoadingPage />;
   if (!buildSessions.data) return <LoadingPage />;
   if (!leaderboard.data) return <LoadingPage />;
+  if (!requests.data) return <LoadingPage />;
   // if (!registerTag.data) return <LoadingPage />;
 
   const sessions = [...buildSessions.data].sort((a, b) => {
@@ -51,14 +57,21 @@ export default function UserPage() {
     return 0;
   });
 
+  const handleDeletUser = async () => {
+    deleteUser.mutateAsync(userId as string);
+    router.push("/admin");
+  };
+
   return (
     <div className="p-2">
       <div className="grid grid-cols-2 gap-2">
+        <RequestsTable requests={requests.data} />
         <p className="flex flex-col items-start">
           <h1 className="text-2xl">
             {sessions[0]?.user.email}&apos;s Sessions
           </h1>
-          Yellow Means Manually Edited
+          Yellow Means Manually Edited <br />
+          Green Means Request Pending
           <BuildSessionTable sessions={sessions} />
         </p>
         <div className="flex flex-col gap-2">
@@ -73,7 +86,7 @@ export default function UserPage() {
               confirmButtonLabel="Delete User"
               openButtonLabel="Delete User"
               description="This will delete this user. This is not reversible."
-              onConfirm={() => deleteUser.mutateAsync(userId as string)}
+              onConfirm={handleDeletUser}
             />
           )}
           <h2 className="p-2">Register New RFID:</h2>

@@ -3,17 +3,15 @@ import { BuildSession, User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ChangeEvent, FC, useState } from "react";
+import { ChangeEvent, type FC, useState } from "react";
 import { trpc } from "~utils/trpc";
 
-type Row = BuildSession & { user: User };
+type Row = BuildSession & { user: User } & { _count: { requests: number } };
 type Props = {
   sessions: Row[];
 };
 
-export const BuildSessionTable: FC<Props> = ({
-  sessions,
-}) => {
+export const BuildSessionTable: FC<Props> = ({ sessions }) => {
   const { data } = useSession();
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -44,7 +42,7 @@ export const BuildSessionTable: FC<Props> = ({
               isAdmin={isAdmin}
             />
           ))}
-          {isAdmin && !showAddForm && (
+          {!showAddForm && (
             <tr>
               <td colSpan={showUserColumn ? 5 : 4}>
                 <div className="flex items-center justify-center">
@@ -96,13 +94,22 @@ const EmailPicker: FC<{
 
 const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
   const router = useRouter();
+  const { data } = useSession();
+
+  const user = data?.user;
+
 
   // if the route is /user/[userId] then we need to get the userId from the route
   // otherwise user input
   const isOnUserPage = router.pathname === "/user/[userId]";
   const userId = isOnUserPage ? (router.query.userId as string) : null;
 
-  const { mutateAsync } = trpc.buildSession.create.useMutation();
+  const trpcUtils = trpc.useUtils();
+
+  const { mutateAsync: adminMutateAsync } = trpc.buildSession.create.useMutation();
+  const { mutateAsync: userMutateAsync } = trpc.requests.create.useMutation();
+
+
   const [buildSession, setBuildSession] = useState<{
     start: {
       hours: number;
@@ -119,11 +126,13 @@ const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
       hours: 0,
       minutes: 0,
     },
-    end: null,
+    end: user?.isAdmin ? null : { hours: 0, minutes: 0 },
     // just the date no time
     date: new Date(new Date().setHours(0, 0, 0, 0)),
     userId: userId ?? "",
   });
+
+  if (!user) return null;
 
   const handleEndCheckbox = (target: ChangeEvent<HTMLInputElement>) => {
     if (!target.target.checked) {
@@ -148,15 +157,39 @@ const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
     start.setHours(buildSession.start.hours, buildSession.start.minutes);
 
     const end = buildSession.end ? new Date(buildSession.date) : null;
+
     if (end && buildSession.end) {
       end.setHours(buildSession.end.hours, buildSession.end.minutes);
     }
 
-    await mutateAsync({
-      startAt: start,
-      endAt: end,
-      userId: buildSession.userId,
-    });
+
+    if (end && start > end) {
+      alert("Start time must be before end time");
+      return;
+    }
+
+    if (user.isAdmin) {
+      await adminMutateAsync({
+        startAt: start,
+        endAt: end,
+        userId: buildSession.userId,
+      });
+    } else {
+      await userMutateAsync({
+        startAt: start,
+        endAt: end!,
+        type: "FULL"
+      });
+    }
+
+
+    if (isOnUserPage) {
+      trpcUtils.buildSession.byUser.invalidate(userId as string)
+    } else {
+      trpcUtils.buildSession.invalidate();
+    }
+
+    trpcUtils.leaderboard.invalidate()
 
     onClose();
     router.reload();
@@ -234,16 +267,17 @@ const CreateRow: FC<{ onClose: () => void }> = ({ onClose }) => {
         />
       </span>
 
-      <span className="flex items-center gap-2">
-        <label htmlFor="end">Set End Time?</label>
-        <input
-          type="checkbox"
-          name="Set End Time"
-          className="rounded-md"
-          id="end"
-          onChange={handleEndCheckbox}
-        />
-      </span>
+      {user.isAdmin &&
+        <span className="flex items-center gap-2">
+          <label htmlFor="end">Set End Time?</label>
+          <input
+            type="checkbox"
+            name="Set End Time"
+            className="rounded-md"
+            id="end"
+            onChange={handleEndCheckbox}
+          />
+        </span>}
 
       {buildSession.end && (
         <span className="flex items-center gap-2">
@@ -317,6 +351,7 @@ const TableRow: FC<{
   showUserColumn: boolean;
 }> = ({ session, isAdmin, showUserColumn }) => {
   const [editMode, setEditMode] = useState(false);
+  const trpcUtils = trpc.useUtils();
 
   const deleteSession = trpc.buildSession.delete.useMutation();
   const router = useRouter();
@@ -326,13 +361,13 @@ const TableRow: FC<{
   return (
     <tr
       className={
-        session.manual ? "bg-yellow-200" : "odd:bg-gray-200 even:bg-gray-100"
+        session._count.requests > 0 ? "bg-green-200" : session.manual ? "bg-yellow-200" : "odd:bg-gray-200 even:bg-gray-100"
       }
     >
       {showUserColumn && (
         <td>
-          <Link href={`/user/${session.user.id}`}>
-            <a className="underline">{session.user.email}</a>
+          <Link className="underline" href={`/user/${session.user.id}`}>
+            {session.user.email}
           </Link>
         </td>
       )}
@@ -380,6 +415,7 @@ const TableRow: FC<{
                   className="cursor-pointer text-2xl"
                   onClick={async () => {
                     await deleteSession.mutateAsync(session.id);
+                    trpcUtils.buildSession.invalidate();
                     router.reload();
                   }}
                 />
@@ -404,14 +440,23 @@ const EditRow: FC<{ session: Row; onCloseEdit: () => void }> = ({
     hours: session.startAt.getHours(),
     minutes: session.startAt.getMinutes(),
   });
+
   const [endAt, setEndAt] = useState(
     session.endAt
       ? { hours: session.endAt.getHours(), minutes: session.endAt.getMinutes() }
-      : { hours: 0, minutes: 0 }
+      : { hours: 0, minutes: 0 },
   );
   const router = useRouter();
 
-  const mutate = trpc.buildSession.edit.useMutation();
+  const trpcUtils = trpc.useUtils();
+  const { data } = useSession();
+
+  const adminMutate = trpc.buildSession.edit.useMutation();
+  const userMutate = trpc.requests.create.useMutation();
+
+  if (!data || !data.user) return null;
+
+  const isAdmin = data.user.isAdmin;
 
   const onSubmit = async () => {
     const startAtDate = new Date(session.startAt);
@@ -423,19 +468,27 @@ const EditRow: FC<{ session: Row; onCloseEdit: () => void }> = ({
     endAtDate.setMinutes(endAt.minutes);
 
     // verify that the start time is before the end time.
-    if (endAt.hours !== 0 && endAt.minutes !== 0 && startAtDate > endAtDate) {
+    if ((endAt.hours !== 0 || endAt.minutes !== 0) && startAtDate > endAtDate) {
       alert("Start time must be before end time");
       return;
     }
 
     // send the request to the server.
-    await mutate.mutateAsync({
-      id: session.id,
-      data: {
-        startAt: startAtDate,
-        endAt: endAt.hours !== 0 && endAt.minutes !== 0 ? null : endAtDate,
-      },
-    });
+
+    if (isAdmin) {
+      await adminMutate.mutateAsync({
+        id: session.id,
+        data: {
+          startAt: startAtDate,
+          endAt: endAt.hours !== 0 && endAt.minutes !== 0 ? null : endAtDate,
+        },
+      });
+    } else {
+      await userMutate.mutateAsync({ sessionId: session.id, endAt: endAtDate, type: "OUT" })
+    }
+
+    trpcUtils.buildSession.invalidate();
+    trpcUtils.leaderboard.invalidate();
 
     onCloseEdit();
     router.reload();
@@ -443,7 +496,13 @@ const EditRow: FC<{ session: Row; onCloseEdit: () => void }> = ({
 
   return (
     <>
-      <td>
+      <td>{!isAdmin ? <>{
+        new Date(session.startAt).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      }</> :
+
         <span className="flex items-center gap-2">
           {/** Because the built in time inputs are bad, let's use a set of 24 hour numeric */}
           <input
@@ -473,7 +532,7 @@ const EditRow: FC<{ session: Row; onCloseEdit: () => void }> = ({
               }));
             }}
           />
-        </span>
+        </span>}
       </td>
       <td>
         <span className="flex items-center gap-2">

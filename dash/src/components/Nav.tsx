@@ -12,10 +12,8 @@ export const Nav = () => {
   return (
     <nav className="flex flex-wrap items-center justify-between bg-gray-800 p-4">
       <div className="mr-6 flex w-full flex-shrink-0 items-center gap-2 text-white">
-        <Link href="/" passHref>
-          <a className="grow text-xl font-semibold tracking-tight">
-            Attendance App
-          </a>
+        <Link href="/" className="grow text-xl font-semibold tracking-tight">
+          Attendance App
         </Link>
         {/** If Signed in Show Signout, otherwise show signout */}
         {signedIn ? (

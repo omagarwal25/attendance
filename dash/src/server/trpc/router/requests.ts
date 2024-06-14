@@ -4,12 +4,35 @@ import { env } from "~env/server.mjs";
 import { requestSchema } from "~models/request";
 import { createTransport, hoursRequestEmail } from "~utils/email";
 import { adminProcedure, protectedProcedure, router } from "../trpc";
+import { BuildSession, User } from "@prisma/client";
+
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & Record<string, never>;
+
+type FullReqeust = Prettify<z.infer<typeof requestSchema> & { type: "FULL" }>;
+type OutRequest = Prettify<z.infer<typeof requestSchema> & { type: "OUT" }>;
+type RequestWithSessionAndUser = (
+  | FullReqeust
+  | (OutRequest & { session: BuildSession })
+) & { user: User; id: string };
 
 export const requestsRouter = router({
-  all: adminProcedure.query(({ ctx }) => {
-    return ctx.prisma.request.findMany({
+  all: adminProcedure.query(async ({ ctx }) => {
+    const data = await ctx.prisma.request.findMany({
       include: { user: true, session: true },
     });
+
+    return data as unknown[] as RequestWithSessionAndUser[];
+  }),
+
+  allPending: adminProcedure.query(async ({ ctx }) => {
+    const data = await ctx.prisma.request.findMany({
+      include: { user: true, session: true },
+      where: { status: "PENDING" },
+    });
+
+    return data as unknown[] as RequestWithSessionAndUser[];
   }),
 
   byUser: protectedProcedure.input(z.string()).query(({ ctx, input }) => {
@@ -23,26 +46,19 @@ export const requestsRouter = router({
     }
   }),
 
-  cancel: protectedProcedure
-    .input(z.string().cuid())
+  pendingByUser: protectedProcedure
+    .input(z.string())
     .query(async ({ ctx, input }) => {
-      const request = await ctx.prisma.request.findUnique({
-        where: { id: input },
-        include: { user: true },
-      });
+      if (ctx.session.user.isAdmin || ctx.session.user.id === input) {
+        const data = await ctx.prisma.request.findMany({
+          where: { userId: input, status: "PENDING" },
+          include: { user: true, session: true },
+        });
 
-      if (!request) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      if (ctx.session.user.id !== request.userId) {
+        return data as unknown[] as RequestWithSessionAndUser[];
+      } else {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
-
-      await ctx.prisma.request.update({
-        where: { id: input },
-        data: { status: "CANCELLED" },
-      });
     }),
 
   deny: adminProcedure
@@ -64,6 +80,13 @@ export const requestsRouter = router({
 
       if (!request) {
         throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      if (request.status === "ACCEPTED") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Request is already approved",
+        });
       }
 
       const type = request.type;
@@ -93,7 +116,8 @@ export const requestsRouter = router({
             user: { connect: { id: request.userId } },
             startAt: request.startAt,
             endAt: request.endAt,
-            buildSessionRequests: { connect: { id: request.id } },
+            requests: { connect: { id: request.id } },
+            manual: true,
           },
         });
 
@@ -122,10 +146,19 @@ export const requestsRouter = router({
           },
         });
 
+        await ctx.prisma.request.updateMany({
+          where: {
+            sessionId: request.sessionId,
+            status: "PENDING",
+          },
+          data: { status: "CANCELLED" },
+        });
+
         await ctx.prisma.buildSession.update({
           where: { id: session.id },
           data: {
             endAt: request.endAt,
+            manual: true,
           },
         });
       }
@@ -151,8 +184,10 @@ export const requestsRouter = router({
           },
         });
 
-        const acceptUrl = `${env.NEXTAUTH_URL}/api/auth/requests/${req.id}/accept`;
-        const denyUrl = `${env.NEXTAUTH_URL}/api/auth/requests/${req.id}/deny`;
+        console.log(env.NEXTAUTH_URL);
+
+        const acceptUrl = `${env.NEXTAUTH_URL}/requests/${req.id}/accept`;
+        const denyUrl = `${env.NEXTAUTH_URL}/requests/${req.id}/deny`;
 
         await createTransport().sendMail({
           from: env.EMAIL_FROM, // sender address
@@ -193,8 +228,8 @@ export const requestsRouter = router({
           },
         });
 
-        const acceptUrl = `${env.NEXTAUTH_URL}/api/auth/requests/${req.id}/accept`;
-        const denyUrl = `${env.NEXTAUTH_URL}/api/auth/requests/${req.id}/deny`;
+        const acceptUrl = `${env.NEXTAUTH_URL}/requests/${req.id}/accept`;
+        const denyUrl = `${env.NEXTAUTH_URL}/requests/${req.id}/deny`;
 
         await createTransport().sendMail({
           from: env.EMAIL_FROM, // sender address
@@ -209,6 +244,28 @@ export const requestsRouter = router({
           }),
         });
       }
+    }),
+
+  cancel: protectedProcedure
+    .input(z.string().cuid())
+    .mutation(async ({ ctx, input }) => {
+      const request = await ctx.prisma.request.findUnique({
+        where: { id: input },
+        include: { user: true },
+      });
+
+      if (!request) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      if (ctx.session.user.id !== request.userId && !ctx.session.user.isAdmin) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      await ctx.prisma.request.update({
+        where: { id: input },
+        data: { status: "CANCELLED" },
+      });
     }),
 
   purge: adminProcedure.mutation(async ({ ctx }) => {

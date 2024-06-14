@@ -7,9 +7,7 @@ export default function AdminPage() {
   const { mutateAsync, status } = trpc.buildSession.digitalTap.useMutation();
   const [userId, setUserId] = useState("");
 
-  if (
-    status === "loading"
-  ) {
+  if (status === "loading") {
     return <LoadingPage />;
   }
 
@@ -32,7 +30,7 @@ export default function AdminPage() {
       </div>
 
       <button
-        className="rounded-md bg-green-500 p-2"
+        className="rounded-md bg-green-600 p-2 text-white"
         onClick={() => mutateAsync(userId)}
       >
         Tap

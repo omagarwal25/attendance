@@ -1,5 +1,5 @@
 import { BuildSession, User } from ".prisma/client";
-import { AppRouterTypes } from "./trpc";
+import { RouterOutput } from "./trpc";
 
 type SessionRow = BuildSession & { user: User };
 
@@ -25,7 +25,7 @@ export const sessionsColumns = [
   { id: "manual", displayName: "Manual" },
 ];
 
-type LeaderboardRow = AppRouterTypes["leaderboard"]["all"]["output"][0];
+type LeaderboardRow = RouterOutput["leaderboard"]["all"][number];
 
 export const getLeaderboardCSV = (table: LeaderboardRow[]) => {
   return table.map(({ id, email, hours }) => ({

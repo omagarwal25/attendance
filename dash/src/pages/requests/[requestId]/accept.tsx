@@ -5,6 +5,7 @@ import { trpc } from "~utils/trpc";
 
 export default function AcceptRequest() {
   const { data, status } = useSession();
+  const trpcUtils = trpc.useUtils();
   const { mutateAsync } = trpc.requests.approve.useMutation();
   const router = useRouter();
 
@@ -24,6 +25,10 @@ export default function AcceptRequest() {
 
   const handleApprove = async () => {
     await mutateAsync(params.requestId);
+
+    await trpcUtils.requests.invalidate();
+    await trpcUtils.buildSession.invalidate();
+    await trpcUtils.leaderboard.invalidate();
 
     router.push("/admin");
   };

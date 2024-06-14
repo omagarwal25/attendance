@@ -43,10 +43,11 @@ const AuthShowcase: React.FC = () => {
           {sessionData ? "Sign out" : "Sign in"}
         </button>
         {sessionData && (
-          <Link href={`/user/${sessionData?.user?.id}`} passHref>
-            <a className="rounded-md bg-blue-600 px-4 py-2 text-xl text-white shadow-lg hover:bg-blue-500">
-              Go to my page
-            </a>
+          <Link
+            href={`/user/${sessionData?.user?.id}`}
+            className="rounded-md bg-blue-600 px-4 py-2 text-xl text-white shadow-lg hover:bg-blue-500"
+          >
+            Go to my page
           </Link>
         )}
       </span>
