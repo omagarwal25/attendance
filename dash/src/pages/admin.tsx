@@ -40,13 +40,13 @@ export default function AdminPage() {
 
   if (
     (buildSessions.isError && buildSessions.error) ||
-    (leaderboard.isError && leaderboard.error)
-    || (requests.isError && requests.error)
+    (leaderboard.isError && leaderboard.error) ||
+    (requests.isError && requests.error)
   ) {
     if (
       buildSessions.error?.data?.code === "UNAUTHORIZED" ||
-      leaderboard.error?.data?.code === "UNAUTHORIZED"
-      || requests.error?.data?.code === "UNAUTHORIZED"
+      leaderboard.error?.data?.code === "UNAUTHORIZED" ||
+      requests.error?.data?.code === "UNAUTHORIZED"
     ) {
       return <div>Unauthorized</div>;
     }
@@ -72,9 +72,9 @@ export default function AdminPage() {
       <h1 className="text-3xl">Admin</h1>
       {/* <Downloads /> */}
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-
         <RequestsTable requests={requests.data} />
 
+        <div></div>
         <div className="flex flex-col items-start self-start">
           <h1 className="text-2xl">Leaderboard</h1>
           <div className="flex flex-col gap-2">
@@ -141,10 +141,7 @@ export default function AdminPage() {
           </div>
           <BuildSessionTable sessions={sessions} />
         </div>
-
       </div>
     </div>
   );
 }
-
-
