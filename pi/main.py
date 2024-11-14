@@ -24,7 +24,7 @@ class Colors(Enum):
     RED = Color(255, 0, 0)
     GREEN = Color(0, 255, 0)
     BLUE = Color(0, 0, 255)
-    YELLOW = Color(255, 255, 0)
+    YELLOW = Color(255, 210, 0)
     CYAN = Color(0, 255, 255)
     MAGENTA = Color(255, 0, 255)
     WHITE = Color(255, 255, 255)
@@ -112,13 +112,17 @@ RGBLight.turnOff()
 
 print("ready to go")
 
-try:
-    while True:
+while True:
+    try:
         # Scan for cards
         (status, TagType) = MIFAREReader.Request(MIFAREReader.PICC_REQIDL)
+        print(status)
+        print(MIFAREReader)
+        print("reader")
 
         # Get the UID of the card
         (status, uid) = MIFAREReader.Anticoll()
+        print(status)
 
         # If we have the UID, continue
         if status == MIFAREReader.MI_OK:
@@ -182,7 +186,5 @@ try:
             time.sleep(0.2)
             RGBLight.turnOff()
             time.sleep(0.5)
-
-
-except KeyboardInterrupt:
-    GPIO.cleanup()
+    except KeyboardInterrupt:
+        GPIO.cleanup()
