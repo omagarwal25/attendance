@@ -9,9 +9,17 @@ import { useSession } from "next-auth/react";
 export const RequestsTable: FC<{
   requests: RouterOutput["requests"]["all"];
 }> = ({ requests }) => {
+  const approveAll = trpc.requests.approveAll.useMutation();
+
   return (
     <div className="flex flex-col items-start self-start">
       <h1 className="text-2xl">Reqeusts</h1>
+      <button
+        onClick={() => approveAll.mutateAsync()}
+        className="rounded-md bg-green-500 p-2 text-white"
+      >
+        Approve All
+      </button>
       <div className="flex w-full flex-col gap-2">
         <table className="w-full table-auto">
           <thead className="bg-gray-300">

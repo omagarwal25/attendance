@@ -70,6 +70,93 @@ export const requestsRouter = router({
       });
     }),
 
+  approveAll: adminProcedure.mutation(async ({ ctx }) => {
+    const requests = await ctx.prisma.request.findMany({
+      where: { status: "PENDING" },
+      include: { user: true, session: true },
+    });
+
+    // approve all
+
+    for (const request of requests) {
+      if (request.status === "ACCEPTED") {
+        continue;
+      }
+
+      if (request.type === "FULL") {
+        if (!request.startAt) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Start date is required session requests",
+          });
+        }
+
+        if (request.startAt.getTime() > request.endAt.getTime()) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Start date must be before end date",
+          });
+        }
+
+        await ctx.prisma.request.update({
+          where: { id: request.id },
+          data: { status: "ACCEPTED" },
+        });
+
+        await ctx.prisma.buildSession.create({
+          data: {
+            user: { connect: { id: request.userId } },
+            startAt: request.startAt,
+            endAt: request.endAt,
+            requests: { connect: { id: request.id } },
+            manual: true,
+          },
+        });
+
+        continue;
+      } else {
+        const session = request.session;
+
+        if (!session) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Session is required for build requests",
+          });
+        }
+
+        if (session.startAt.getTime() > request.endAt.getTime()) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Start date must be before end date",
+          });
+        }
+
+        await ctx.prisma.request.update({
+          where: { id: request.id },
+          data: {
+            status: "ACCEPTED",
+          },
+        });
+
+        await ctx.prisma.request.updateMany({
+          where: {
+            sessionId: request.sessionId,
+            status: "PENDING",
+          },
+          data: { status: "CANCELLED" },
+        });
+
+        await ctx.prisma.buildSession.update({
+          where: { id: session.id },
+          data: {
+            endAt: request.endAt,
+            manual: true,
+          },
+        });
+      }
+    }
+  }),
+
   approve: adminProcedure
     .input(z.string().cuid())
     .mutation(async ({ ctx, input }) => {
