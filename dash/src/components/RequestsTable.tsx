@@ -13,7 +13,7 @@ export const RequestsTable: FC<{
 
   return (
     <div className="flex flex-col items-start self-start">
-      <h1 className="text-2xl">Reqeusts</h1>
+      <h1 className="text-2xl">Requests</h1>
       <button
         onClick={() => approveAll.mutateAsync()}
         className="rounded-md bg-green-500 p-2 text-white"
